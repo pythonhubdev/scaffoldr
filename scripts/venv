@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Choose activation script based on OS
+if [[ "$OSTYPE" =~ ^(cygwin|msys|win32) ]]; then
+  ACTIVATE=".venv/Scripts/activate"
+else
+  ACTIVATE=".venv/bin/activate"
+fi
+
+if [[ -f "$ACTIVATE" ]]; then
+  echo "Activating existing virtualenv…"
+  # shellcheck source=/dev/null
+  source "$ACTIVATE"
+else
+  echo "Creating and activating new virtualenv…"
+  uv venv .venv
+  # shellcheck source=/dev/null
+  source "$ACTIVATE"
+fi
+
+echo "✔ Virtualenv is ready."
