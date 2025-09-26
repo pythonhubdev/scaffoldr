@@ -16,7 +16,7 @@ jobs:
             lock_file_artifact: uv.lock
         steps:
             -   name: Check out repository
-                uses: actions/checkout@v4
+                uses: actions/checkout@v5
                 with:
                     ref: ${{ github.ref }}
                     fetch-depth: 0
