@@ -39,9 +39,9 @@ If yes, describe impact and migration steps:
 ## Testing & Verification
 
 - Commands run locally:
-  - [ ] task test (pytest)
-  - [ ] task lint (ruff/pyright/mypy)
-  - [ ] pre-commit run --all-files (optional)
+	- [ ] task test (pytest)
+	- [ ] task lint (ruff/pyright/mypy)
+	- [ ] pre-commit run --all-files (optional)
 - Added/updated tests: [ ] unit [ ] integration
 - Key scenarios and edge cases:
 

@@ -2,14 +2,17 @@
 
 Hello Developers! 👋🏻
 
-Thank you for spending your valuable time to contribute to **Scaffoldr**. All PRs, contributions, reviews, and suggestions are welcome. Please follow the guidelines below to contribute to this project.
+Thank you for spending your valuable time to contribute to **Scaffoldr**. All PRs, contributions, reviews, and
+suggestions are welcome. Please follow the guidelines below to contribute to this project.
 
 ## 🐛 Creating an Issue
 
 Please follow the issue template while creating an issue. If you are creating an issue, follow the below templates:
 
-1. **For Bugs** - [Bug Template](https://github.com/pythonhubdev/scaffoldr/blob/main/.github/ISSUE_TEMPLATE/bug_report.md)
-2. **For Feature Requests** - [Feature Template](https://github.com/pythonhubdev/scaffoldr/blob/main/.github/ISSUE_TEMPLATE/feature_request.md)
+1. **For Bugs
+   ** - [Bug Template](https://github.com/pythonhubdev/scaffoldr/blob/main/.github/ISSUE_TEMPLATE/bug_report.md)
+2. **For Feature Requests
+   ** - [Feature Template](https://github.com/pythonhubdev/scaffoldr/blob/main/.github/ISSUE_TEMPLATE/feature_request.md)
 
 You can also use the custom template to create an issue if the above templates don't match your needs.
 
@@ -59,9 +62,9 @@ You can also use the custom template to create an issue if the above templates d
    ```
 
 2. **Make your changes**
-   - Follow the existing code style and patterns
-   - Add tests for new functionality
-   - Update documentation if needed
+	- Follow the existing code style and patterns
+	- Add tests for new functionality
+	- Update documentation if needed
 
 3. **Run quality checks**
    ```bash
@@ -135,14 +138,14 @@ task ds-store       # Remove .DS_Store files
 ## 🔄 Creating a Pull Request
 
 1. **Ensure all checks pass**
-   - All tests pass (`task test`)
-   - Linting passes (`task lint`)
-   - Pre-commit hooks pass (`task pre-commit`)
+	- All tests pass (`task test`)
+	- Linting passes (`task lint`)
+	- Pre-commit hooks pass (`task pre-commit`)
 
 2. **Write a clear PR description**
-   - Describe what your PR does
-   - Reference any related issues
-   - Include screenshots if UI changes are involved
+	- Describe what your PR does
+	- Reference any related issues
+	- Include screenshots if UI changes are involved
 
 3. **Use conventional commit messages**
    ```
@@ -165,11 +168,13 @@ task ds-store       # Remove .DS_Store files
 
 - **General Questions**: Open a [Discussion](https://github.com/pythonhubdev/scaffoldr/discussions)
 - **Bug Reports**: Create an [Issue](https://github.com/pythonhubdev/scaffoldr/issues)
-- **Feature Requests**: Create a [Feature Request](https://github.com/pythonhubdev/scaffoldr/issues/new?template=feature_request.md)
+- **Feature Requests**: Create
+  a [Feature Request](https://github.com/pythonhubdev/scaffoldr/issues/new?template=feature_request.md)
 
 ## 📜 Code of Conduct
 
-Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project, you agree to abide by its terms.
+Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in
+this project, you agree to abide by its terms.
 
 ---
 
