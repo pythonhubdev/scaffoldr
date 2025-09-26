@@ -1,0 +1,10 @@
+default_agents = ["copilot", "gemini-cli"]
+
+
+[agents.copilot]
+enabled = true
+output_path = ".github/copilot-instructions.md"
+
+
+[agents.gemini-cli]
+enabled = true

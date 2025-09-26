@@ -1,0 +1,101 @@
+version: '3'
+
+tasks:
+    # ——————————————————————————————————————————————————————————————————————————
+    # DELETE all .DS_Store files (no status-check needed)
+    ds-store:
+        desc: "Find & delete all .DS_Store files"
+        cmds:
+            - find . -name ".DS_Store" -type f -delete
+
+    # ——————————————————————————————————————————————————————————————————————————
+    # DELETE all __pycache__ directories and .py[cod] files
+    pycache:
+        desc: "Remove Python cache files"
+        cmds:
+            - find . -name "__pycache__" -type d -exec rm -rf {} +
+            - find . -name "*.py[cod]" -type f -delete
+
+    # ——————————————————————————————————————————————————————————————————————————
+    # INSTALL uv (skipped if already on PATH)
+    uv:
+        desc: "Install uv"
+        status:
+            - which  v
+        platforms: [ darwin,linux ]
+        cmds:
+            - curl -LsSf https://astral.sh/uv/install.sh | sh
+
+    uv-win:
+        desc: "Install uv on Windows"
+        status:
+            - where.exe uv
+        platforms: [ windows ]
+        cmds:
+            - powershell -ExecutionPolicy Bypass -Command \
+                "irm https://astral.sh/uv/install.ps1 | iex"
+
+    # ——————————————————————————————————————————————————————————————————————————
+    # SYNC deps, VENV, PRE-COMMIT
+    deps:
+        desc: "uv sync"
+        cmds:
+            - uv sync --all-extras
+
+    venv:
+        desc: "create .venv or activate if exists"
+        status:
+            - test -f .venv/bin/activate || test -f .venv/Scripts/activate
+        cmds:
+            - scripts/venv
+
+    ipc:
+        desc: "Install pre-commit hooks"
+        status:
+            - test -d .git/hooks && grep -q pre-commit .git/hooks/pre-commit
+        cmds:
+            - pre-commit install
+
+    pre-commit:
+        desc: "Run pre-commit hooks"
+        cmds:
+            - pre-commit run --all-files
+
+    # ——————————————————————————————————————————————————————————————————————————
+    # DELETE all stale git branches
+    del-branches:
+        desc: "Delete all stale git branches"
+        cmds:
+            - scripts/delete
+
+    setup:
+        desc: "One-shot project bootstrap"
+        deps:
+            - uv
+            - deps
+            - venv
+            - ipc
+            - pre-commit
+
+    test:
+        desc: "Run tests with coverage report"
+        cmds:
+            - pytest --cov=src --cov-report=html
+
+    test-u:
+        desc: "Run only unit tests"
+        cmds:
+            - pytest -m unit --cov=src --cov-report=html
+
+    lint:
+        desc: "Run linters"
+        cmds:
+            - uv run ruff format .
+            - uv run ruff check .
+            - uv run mypy .
+            - uv run basedpyright .
+
+    ruler:
+        desc: "Run ruler"
+        cmds:
+            - npx @intellectronica/ruler apply --mcp --config .ruler/ruler.toml
