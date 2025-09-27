@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.13"
 
 [[package]]
@@ -749,7 +749,7 @@ wheels = [
 
 [[package]]
 name = "scaffoldr"
-version = "0.2.1"
+version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "python-semantic-release" },

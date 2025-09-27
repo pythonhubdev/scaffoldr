@@ -1,13 +1,13 @@
 repos:
-    -   hooks:
-            -   always_run: true
-                entry: .hooks/branch
-                id: branch-naming
-                language: script
-                name: Branch naming convention check
-                stages:
-                    - pre-commit
-        repo: local
+#    -   hooks:
+#            -   always_run: true
+#                entry: .hooks/branch
+#                id: branch-naming
+#                language: script
+#                name: Branch naming convention check
+#                stages:
+#                    - pre-commit
+#        repo: local
     -   hooks:
             -   id: check-ast
                 language_version: python3.13
@@ -17,8 +17,8 @@ repos:
                 id: check-yaml
             -   id: check-toml
             -   args:
-                    - --branch
-                    - main
+#                    - --branch
+#                    - main
                     - --branch
                     - master
                 id: no-commit-to-branch

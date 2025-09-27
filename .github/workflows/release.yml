@@ -104,7 +104,7 @@ jobs:
             -   name: Update version and commit/tag/push
                 env:
                     GH_TOKEN: ${{ secrets.GH_TOKEN }}
-                run: uv run semantic-release -vv version
+                run: uv run semantic-release -vv version --no-push
 
             -   name: Build artifacts with new version
                 run: uv build
@@ -112,7 +112,7 @@ jobs:
             -   name: Generate changelog
                 env:
                     GH_TOKEN: ${{ secrets.GH_TOKEN }}
-                run: uv run semantic-release -vv --strict changelog
+                run: uv run semantic-release -vv --strict changelog --no-push
 
             -   name: Amend commit with changelog and lock file
                 run: |
