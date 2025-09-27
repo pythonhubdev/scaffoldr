@@ -122,7 +122,7 @@ jobs:
                     name: ${{ needs.build.outputs.lock-file-artifact }}
 
             -   name: Update version and commit/tag/push
-                run: uv run semantic-release -vv version --no-push
+                run: uv run semantic-release -vv version
 
             -   name: Build artifacts with new version
                 run: uv build
@@ -139,4 +139,4 @@ jobs:
                     git push --tags --force
 
             -   name: Publish release
-                run: uv run semantic-release -vv publish  # Uploads dist/ to GitHub Release
+                run: uv run semantic-release -vv publish
