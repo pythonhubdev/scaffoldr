@@ -77,6 +77,7 @@ jobs:
                 uses: actions/checkout@v4
                 with:
                     ref: ${{ github.ref }}
+                    token: ${{ secrets.GH_TOKEN }}
                     fetch-depth: 0
 
             -   name: Configure Git user
@@ -102,16 +103,17 @@ jobs:
 
             -   name: Update version and commit/tag/push
                 env:
-                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                run: uv run semantic-release -vv version  # Updates pyproject.toml, commits, tags, pushes
+                    env:
+                        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+                run: uv run semantic-release -vv version
 
             -   name: Build artifacts with new version
-                run: uv build  # Builds dist/ with the updated version from pyproject.toml
+                run: uv build
 
             -   name: Generate changelog
                 env:
-                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                run: uv run semantic-release -vv --strict changelog  # Generates/updates CHANGELOG.md
+                    GH_TOKEN: ${{ secrets.GH_TOKEN }}
+                run: uv run semantic-release -vv --strict changelog
 
             -   name: Amend commit with changelog and lock file
                 run: |
