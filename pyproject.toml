@@ -1,7 +1,7 @@
 [project]
 name = "scaffoldr"
 version = "0.2.1"
-description = "Flask/FastAPI Architecture Application Generator"
+description = "Generate production-ready Python web projects in seconds."
 authors = [
 	{ name = "Vetrichelvan", email = "pythonhubdev@gmail.com" }
 ]
@@ -38,7 +38,7 @@ dev = [
 ]
 
 [project.scripts]
-scaffoldr = "scaffoldr.app:typer_app"
+scaffoldr = "scaffoldr.app:app"
 
 
 [tool.commitizen]

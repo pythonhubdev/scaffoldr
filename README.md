@@ -4,9 +4,15 @@
 
 **Modern Python web framework project generator with production-ready architecture.**
 
-Scaffoldr is a CLI tool designed to help developers quickly set up and manage project structures, configurations, and
-boilerplate code for modern Python web frameworks. It automates the initial setup process, allowing developers to focus
-on writing code rather than spending time on repetitive tasks.
+Scaffoldr is a command-line toolkit that rapidly scaffolds full-featured Python web projects using modern best
+practices. Pick a template, and Scaffoldr creates a consistent, opinionated project layout with sensible defaults for
+packaging, configuration, testing, OpenAPI docs, and containerized deployments — all designed to be easy to extend and
+maintain.
+
+It accelerates day-one productivity by removing repetitive setup work: boilerplate routes, dependency management,
+linting, unit-test scaffolds, CI pipeline stubs, and a ready-to-run Docker configuration are included out of the box.
+Templates are pluggable, letting teams standardize on their preferred frameworks and conventions while keeping the setup
+fast and repeatable.
 
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -67,7 +73,8 @@ scaffoldr --no-banner generate my-project
 
 ### ✨ Animated Banner
 
-Scaffoldr features a beautiful animated ASCII banner with rainbow wave effects that displays when you run the CLI! The banner showcases the "SCAFFOLDR" logo with:
+Scaffoldr features a beautiful animated ASCII banner with rainbow wave effects that displays when you run the CLI! The
+banner showcases the "SCAFFOLDR" logo with:
 
 - 🌈 **Rainbow color cycling** - Dynamic HSL color transitions
 - 🌊 **Wave animations** - Smooth sine wave effects across the text
