@@ -1,0 +1,24 @@
+{
+	"include": [
+		"src",
+		"tests"
+	],
+	"exclude": [
+		".venv",
+		"**/__pycache__",
+		"dist",
+		"build",
+		".git"
+	],
+	"defineConstant": {
+		"DEBUG": true
+	},
+	"stubPath": "",
+	"reportMissingImports": "error",
+	"reportMissingTypeStubs": false,
+	"pythonVersion": "3.13",
+	"pythonPlatform": "All",
+	"useLibraryCodeForTypes": true,
+	"autoImportCompletions": true,
+	"reportUnusedCallResult": false
+}

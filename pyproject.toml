@@ -1,7 +1,7 @@
 [project]
 name = "scaffoldr"
 version = "0.2.1"
-description = "Flask/FastAPI Architecture Application Generator"
+description = "Generate production-ready Python web projects in seconds."
 authors = [
 	{ name = "Vetrichelvan", email = "pythonhubdev@gmail.com" }
 ]
@@ -21,6 +21,7 @@ dependencies = [
 	"python-semantic-release>=10.4.1",
 	"typer>=0.19.2",
 	"uv-build>=0.8.22",
+	"rich>=13.7.0",
 ]
 
 [dependency-groups]
@@ -36,8 +37,8 @@ dev = [
 	"syrupy>=4.9.1",
 ]
 
-[tool.scripts]
-scaffoldr = "scaffoldr.app:typer_app"
+[project.scripts]
+scaffoldr = "scaffoldr.app:app"
 
 
 [tool.commitizen]
