@@ -1,4 +1,6 @@
 name: Code Formatting and Linting
+permissions:
+    contents: read
 
 on:
     push:
