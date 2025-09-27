@@ -103,8 +103,7 @@ jobs:
 
             -   name: Update version and commit/tag/push
                 env:
-                    env:
-                        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+                    GH_TOKEN: ${{ secrets.GH_TOKEN }}
                 run: uv run semantic-release -vv version
 
             -   name: Build artifacts with new version
