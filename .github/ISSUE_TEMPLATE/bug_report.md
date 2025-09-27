@@ -28,7 +28,7 @@ Briefly describe the issue.
 
 - Commit SHA / Branch: e.g., 1a2b3c4 / feature/x
 - vox-sdk version (tag if any): e.g., 1.3.0
-- Python: e.g., 3.12.4
+- Python: e.g., 3.13.0
 - OS: e.g., macOS 14.5, Ubuntu 22.04, Windows 11
 - uv version: output of `uv --version`
 - Task version: output of `task --version`
