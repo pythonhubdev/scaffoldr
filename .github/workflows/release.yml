@@ -19,10 +19,17 @@ jobs:
             dist_artifacts_dir: dist
             lock_file_artifact: uv.lock
         steps:
+            -   uses: actions/create-github-app-token@v2
+                id: app-token
+                with:
+                    app-id: ${{ vars.APP_ID }}
+                    private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
             -   name: Check out repository
                 uses: actions/checkout@v5
                 with:
                     ref: ${{ github.ref }}
+                    token: ${{ steps.app-token.outputs.token }}
                     fetch-depth: 0
 
             -   name: Configure Git user
@@ -81,7 +88,6 @@ jobs:
                 uses: actions/checkout@v4
                 with:
                     ref: ${{ github.ref }}
-                    token: ${{ secrets.GH_TOKEN }}
                     fetch-depth: 0
 
             -   name: Configure Git user
@@ -106,21 +112,15 @@ jobs:
                     name: ${{ needs.build.outputs.lock-file-artifact }}
 
             -   name: Update version and commit/tag/push
-                env:
-                    GH_TOKEN: ${{ secrets.GH_TOKEN }}
                 run: uv run semantic-release -vv version --no-push
 
             -   name: Build artifacts with new version
                 run: uv build
 
             -   name: Generate changelog
-                env:
-                    GH_TOKEN: ${{ secrets.GH_TOKEN }}
                 run: uv run semantic-release -vv --strict changelog
 
             -   name: Amend commit with changelog and lock file
-                env:
-                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 run: |
                     git add CHANGELOG.md uv.lock
                     git commit --amend --no-edit
@@ -129,6 +129,4 @@ jobs:
                     git push --tags --force
 
             -   name: Publish release
-                env:
-                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 run: uv run semantic-release -vv publish  # Uploads dist/ to GitHub Release
