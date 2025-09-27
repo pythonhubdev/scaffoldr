@@ -74,8 +74,8 @@ High-level approach and rationale. Mention alternatives considered.
 - Integration tests (end-to-end pipeline): scenarios
 - Edge cases: timeouts, retries, model unavailability, interruptions
 - Commands to run locally:
-  - [ ] task test
-  - [ ] task lint
+	- [ ] task test
+	- [ ] task lint
 
 ## Acceptance Criteria
 

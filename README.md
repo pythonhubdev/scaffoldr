@@ -4,7 +4,9 @@
 
 **Modern Python web framework project generator with production-ready architecture.**
 
-Scaffoldr is a CLI tool designed to help developers quickly set up and manage project structures, configurations, and boilerplate code for modern Python web frameworks. It automates the initial setup process, allowing developers to focus on writing code rather than spending time on repetitive tasks.
+Scaffoldr is a CLI tool designed to help developers quickly set up and manage project structures, configurations, and
+boilerplate code for modern Python web frameworks. It automates the initial setup process, allowing developers to focus
+on writing code rather than spending time on repetitive tasks.
 
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -62,13 +64,13 @@ scaffoldr generate --help
 
 ## 🏗️ Supported Frameworks
 
-| Framework | Status | Description |
-|-----------|--------|-------------|
-| **FastAPI** | ✅ Available | Modern, high-performance web framework |
-| **Flask** | 🚧 Coming Soon | Lightweight and flexible web framework |
-| **Litestar** | 🚧 Planned | High-performance ASGI web framework |
-| **BlackSheep** | 🚧 Planned | Fast ASGI web framework |
-| **Robyn** | 🚧 Planned | Rust-powered Python web framework |
+| Framework      | Status         | Description                            |
+|----------------|----------------|----------------------------------------|
+| **FastAPI**    | ✅ Available    | Modern, high-performance web framework |
+| **Flask**      | 🚧 Coming Soon | Lightweight and flexible web framework |
+| **Litestar**   | 🚧 Planned     | High-performance ASGI web framework    |
+| **BlackSheep** | 🚧 Planned     | Fast ASGI web framework                |
+| **Robyn**      | 🚧 Planned     | Rust-powered Python web framework      |
 
 ## 📁 Generated Project Structure
 

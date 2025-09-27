@@ -150,11 +150,11 @@ app.include_router(api.router, prefix="/api")
 ### Route Patterns
 
 1. **RESTful Design**: Follow REST conventions
-    - `GET /api/storage/files` - List resources
-    - `POST /api/storage/upload` - Create resource
-    - `GET /api/storage/files/{id}` - Get specific resource
-    - `PUT /api/storage/files/{id}` - Update resource
-    - `DELETE /api/storage/files/{id}` - Delete resource
+	- `GET /api/storage/files` - List resources
+	- `POST /api/storage/upload` - Create resource
+	- `GET /api/storage/files/{id}` - Get specific resource
+	- `PUT /api/storage/files/{id}` - Update resource
+	- `DELETE /api/storage/files/{id}` - Delete resource
 
 2. **Consistent Response Format**: All endpoints return structured responses
 3. **Proper Status Codes**: Use appropriate HTTP status codes
@@ -423,9 +423,9 @@ async def custom_exception_handler(request: Request, exc: CustomException):
 ### Git Workflow
 
 1. **Branch Naming**:
-    - Features: `feature/feature-name`
-    - Bug fixes: `fix/bug-description`
-    - Hotfixes: `hotfix/critical-issue`
+	- Features: `feature/feature-name`
+	- Bug fixes: `fix/bug-description`
+	- Hotfixes: `hotfix/critical-issue`
 
 2. **Commit Messages**: Use conventional commits format
    ```

@@ -36,11 +36,11 @@ Briefly describe the issue.
 - Hardware (if relevant): CPU/GPU model, RAM
 - Key deps (if relevant): torch, transformers, kokoro, ollama, openai, huggingface-hub
 - Env vars (redact secrets):
-  - OPEN_ROUTER_API_KEY (redacted)
-  - HUGGINGFACE_API_KEY (redacted)
-  - WHISPER_MODEL_SIZE (e.g., base)
-  - DEFAULT_LLM_MODEL (e.g., openchat/openchat-3.5)
-  - DEFAULT_VOICE_ID (e.g., en_US-lessac-medium)
+	- OPEN_ROUTER_API_KEY (redacted)
+	- HUGGINGFACE_API_KEY (redacted)
+	- WHISPER_MODEL_SIZE (e.g., base)
+	- DEFAULT_LLM_MODEL (e.g., openchat/openchat-3.5)
+	- DEFAULT_VOICE_ID (e.g., en_US-lessac-medium)
 
 ## Steps to Reproduce
 
