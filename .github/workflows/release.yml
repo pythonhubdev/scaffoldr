@@ -112,7 +112,7 @@ jobs:
             -   name: Generate changelog
                 env:
                     GH_TOKEN: ${{ secrets.GH_TOKEN }}
-                run: uv run semantic-release -vv --strict changelog --no-push
+                run: uv run semantic-release -vv --strict changelog
 
             -   name: Amend commit with changelog and lock file
                 run: |
