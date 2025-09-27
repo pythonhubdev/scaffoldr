@@ -21,6 +21,7 @@ dependencies = [
 	"python-semantic-release>=10.4.1",
 	"typer>=0.19.2",
 	"uv-build>=0.8.22",
+	"rich>=13.7.0",
 ]
 
 [dependency-groups]
@@ -36,7 +37,7 @@ dev = [
 	"syrupy>=4.9.1",
 ]
 
-[tool.scripts]
+[project.scripts]
 scaffoldr = "scaffoldr.app:typer_app"
 
 
