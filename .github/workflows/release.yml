@@ -9,7 +9,11 @@ jobs:
     build:
         runs-on: ubuntu-latest
         permissions:
-            contents: read
+            contents: write
+            pull-requests: write
+            actions: write
+            checks: write
+            statuses: write
         env:
             dist_artifacts_name: dist
             dist_artifacts_dir: dist
@@ -115,6 +119,8 @@ jobs:
                 run: uv run semantic-release -vv --strict changelog
 
             -   name: Amend commit with changelog and lock file
+                env:
+                    GH_TOKEN: ${{ secrets.GH_TOKEN }}
                 run: |
                     git add CHANGELOG.md uv.lock
                     git commit --amend --no-edit
