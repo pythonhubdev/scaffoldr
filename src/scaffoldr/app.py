@@ -26,11 +26,11 @@ def main(
     if version:
         typer.echo("scaffoldr 0.2.1")
         raise typer.Exit()
-    
+
     # Show animated banner unless disabled
     if not no_banner:
         show_animated_banner()
-    
+
     # If no subcommand was called, show help
     if ctx.invoked_subcommand is None:
         typer.echo(ctx.get_help())
@@ -38,7 +38,9 @@ def main(
 
 @typer_app.command()
 def generate(
-    project_name: Annotated[str, typer.Argument(help="Name of the project to generate")],
+    project_name: Annotated[
+        str, typer.Argument(help="Name of the project to generate")
+    ],
     framework: Annotated[
         str, typer.Option("--framework", "-f", help="Framework to use")
     ] = "fastapi",

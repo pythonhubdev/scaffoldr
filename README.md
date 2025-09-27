@@ -60,7 +60,22 @@ scaffoldr generate my-project --framework fastapi --database postgres --auth jwt
 # Get help
 scaffoldr --help
 scaffoldr generate --help
+
+# Disable the animated banner
+scaffoldr --no-banner generate my-project
 ```
+
+### ✨ Animated Banner
+
+Scaffoldr features a beautiful animated ASCII banner with rainbow wave effects that displays when you run the CLI! The banner showcases the "SCAFFOLDR" logo with:
+
+- 🌈 **Rainbow color cycling** - Dynamic HSL color transitions
+- 🌊 **Wave animations** - Smooth sine wave effects across the text
+- ⚡ **High frame rate** - Smooth 15 FPS animations for 3 seconds
+- 🎨 **Gradient finale** - Beautiful blue-to-purple gradient after animation
+- 🚫 **Optional disable** - Use `--no-banner` to skip the animation
+
+The banner is inspired by GitHub Copilot CLI and adds a delightful touch to your scaffolding experience!
 
 ## 🏗️ Supported Frameworks
 
