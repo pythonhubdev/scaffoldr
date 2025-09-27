@@ -120,7 +120,7 @@ jobs:
 
             -   name: Amend commit with changelog and lock file
                 env:
-                    GH_TOKEN: ${{ secrets.GH_TOKEN }}
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 run: |
                     git add CHANGELOG.md uv.lock
                     git commit --amend --no-edit
