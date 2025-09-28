@@ -29,7 +29,7 @@ test_config() {
     rm -rf "$destination/$project_name"
 
     # Build the command
-    cmd="uv run scaffoldr generate --no-banner --project-name \"$project_name\" --framework \"$framework\" --destination \"$destination\" --python-version \"$python_version\" --email \"$email\" --name \"$name\" --description \"$description\""
+    cmd="uv run scaffoldr --no-banner generate --project-name \"$project_name\" --framework \"$framework\" --destination \"$destination\" --python-version \"$python_version\" --email \"$email\" --name \"$name\" --description \"$description\""
 
     if [ "$docker" = "true" ]; then
         cmd="$cmd --docker"
@@ -38,7 +38,7 @@ test_config() {
     fi
 
     if [ "$use_cloud" = "true" ]; then
-        cmd="$cmd --use-cloud"
+        cmd="$cmd --use-cloud --cloud-type aws"
     else
         cmd="$cmd --no-cloud"
     fi
