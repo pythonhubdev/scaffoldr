@@ -31,7 +31,7 @@ fast and repeatable.
 ## 📋 Requirements
 
 - **Python 3.13+**
-- **uv** package manager (will be installed automatically if not present)
+- **uv** package manager
 
 ## 🚀 Quick Start
 
