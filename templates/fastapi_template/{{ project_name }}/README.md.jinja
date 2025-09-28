@@ -6,8 +6,15 @@
 
 - **FastAPI**: Modern, fast web framework for building APIs
 - **Pydantic**: Data validation and serialization
+{% if database %}
+{% if database_type == 'sqlalchemy' %}
 - **SQLAlchemy**: SQL toolkit and ORM
 - **Alembic**: Database migration tool
+{% elif database_type == 'mongodb' %}
+- **Beanie**: MongoDB ODM for Python
+- **Motor**: Asynchronous MongoDB driver
+{% endif %}
+{% endif %}
 - **Uvicorn**: ASGI web server
 - **Granian**: High-performance web server
   {% if cloud_type == 'aws' %}

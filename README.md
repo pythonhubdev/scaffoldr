@@ -72,7 +72,7 @@ scaffoldr --no-banner generate my-project
 When you generate a FastAPI project, you get:
 
 - **Complete FastAPI Application**: Pre-configured with proper structure
-- **Database Integration**: SQLAlchemy with Alembic migrations
+- **Database Integration**: SQLAlchemy with Alembic migrations or MongoDB with Beanie ODM
 - **File Storage**: Built-in file upload/download endpoints
 - **API Documentation**: Auto-generated OpenAPI/Swagger docs
 - **Development Tools**: Pre-configured with ruff, mypy, pytest
@@ -117,7 +117,9 @@ my-project/
 │       ├── core/               # Core components (config, utils, etc.)
 │       ├── features/           # Feature modules (business logic)
 │       ├── services/           # External service integrations
-│       └── database/           # Data access layer
+{% if database %}
+│       └── database/           # Data access layer (SQLAlchemy or MongoDB)
+{% endif %}
 ├── tests/                      # Comprehensive test suite
 ├── scripts/                    # Development scripts
 ├── .github/                    # GitHub workflows and templates

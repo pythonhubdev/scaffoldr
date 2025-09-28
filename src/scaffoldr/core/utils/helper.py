@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, cast
 import typer
 from copier import subprocess
 
-from scaffoldr.core.constants.const import CloudTypes
+from scaffoldr.core.constants.const import CloudTypes, DatabaseTypes, console
 
 if TYPE_CHECKING:
 	from collections.abc import Iterable
@@ -40,6 +40,20 @@ class Helper:
 		cloud_type: str = cast("str", typer.prompt(f"Cloud type: {' | '.join(cloud_types)}"))
 		if cloud_type in cloud_types:
 			return cloud_type
-		raise ValueError(
-			f"Invalid cloud type: {cloud_type}. Must be one of: {' | '.join(cloud_types)}",
+		console.print(f"[red]Error:[/red] Invalid cloud type: {cloud_type}")
+		raise typer.Exit(1)
+
+	@staticmethod
+	def database_type() -> str:
+		"""
+		Prompt for database type selection.
+		"""
+		database_types = list(DatabaseTypes)
+		database_type: str = cast(
+			"str",
+			typer.prompt(f"Database type: {' | '.join(database_types)}"),
 		)
+		if database_type in database_types:
+			return database_type
+		console.print(f"[red]Error:[/red] Invalid database type: {database_type}")
+		raise typer.Exit(1)

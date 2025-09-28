@@ -39,8 +39,14 @@ dependencies = [
 	"azure-identity>=1.25.0",
 	{% endif %}
 	{% if database %}
+	{% if database_type == 'sqlalchemy' %}
 	"aiosqlite>=0.21.0",
 	"sqlalchemy[asyncio]>=2.0.0",
+	{% elif database_type == 'mongodb' %}
+	"beanie>=2.0.0",
+	"motor>=3.7.1",
+	"pymongo>=4.15.1",
+	{% endif %}
 	{% endif %}
 	"fastapi>=0.117.1",
 	"granian[reload]>=2.5.4",
