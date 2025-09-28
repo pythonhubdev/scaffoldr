@@ -38,6 +38,10 @@ class GenerateCommand:
 		if use_cloud:
 			cloud_type = Helper.cloud_type()
 
+		database_type = None
+		if use_database:
+			database_type = Helper.database_type()
+
 		project_name = project_name.replace(" ", "-").lower()
 		# Check if directory already exists
 		if destination == ".":
@@ -71,6 +75,7 @@ class GenerateCommand:
 			"use_docker": docker,
 			"cloud_type": cloud_type,
 			"database": use_database,
+			"database_type": database_type,
 			"framework": framework,
 		}
 

@@ -22,6 +22,7 @@ test_config() {
     local docker="$9"
     local use_cloud="${10}"
     local use_database="${11}"
+    local database_type="${12:-sqlalchemy}"
 
     echo "Testing: $config_name"
 
@@ -38,13 +39,13 @@ test_config() {
     fi
 
     if [ "$use_cloud" = "true" ]; then
-        cmd="$cmd --use-cloud --cloud-type aws"
+        cmd="$cmd --use-cloud"
     else
         cmd="$cmd --no-cloud"
     fi
 
     if [ "$use_database" = "true" ]; then
-        cmd="$cmd --use-database"
+        cmd="$cmd --use-database --database-type $database_type"
     else
         cmd="$cmd --no-database"
     fi
@@ -94,13 +95,13 @@ test_config() {
 
 # Test configurations
 echo "Testing basic FastAPI configuration..."
-test_config "fastapi-basic" "test-fastapi-basic" "fastapi" "$TEST_DIR" "3.13" "test@example.com" "Test User" "Test project" "true" "true" "true"
+test_config "fastapi-basic" "test-fastapi-basic" "fastapi" "$TEST_DIR" "3.13" "test@example.com" "Test User" "Test project" "true" "true" "true" "sqlalchemy"
 
 echo "Testing FastAPI without Docker..."
-test_config "fastapi-no-docker" "test-fastapi-no-docker" "fastapi" "$TEST_DIR" "3.13" "test@example.com" "Test User" "Test project" "false" "true" "true"
+test_config "fastapi-no-docker" "test-fastapi-no-docker" "fastapi" "$TEST_DIR" "3.13" "test@example.com" "Test User" "Test project" "false" "true" "true" "sqlalchemy"
 
 echo "Testing FastAPI without cloud..."
-test_config "fastapi-no-cloud" "test-fastapi-no-cloud" "fastapi" "$TEST_DIR" "3.13" "test@example.com" "Test User" "Test project" "true" "false" "true"
+test_config "fastapi-no-cloud" "test-fastapi-no-cloud" "fastapi" "$TEST_DIR" "3.13" "test@example.com" "Test User" "Test project" "true" "false" "true" "sqlalchemy"
 
 echo "Testing FastAPI without database..."
 test_config "fastapi-no-db" "test-fastapi-no-db" "fastapi" "$TEST_DIR" "3.13" "test@example.com" "Test User" "Test project" "true" "true" "false"
@@ -112,6 +113,12 @@ echo "Testing Python 3.12..."
 test_config "fastapi-py312" "test-fastapi-py312" "fastapi" "$TEST_DIR" "3.12" "test@example.com" "Test User" "Test project" "true" "true" "true"
 
 echo "Testing different destination..."
-test_config "fastapi-custom-dest" "test-fastapi-dest" "fastapi" "/tmp" "3.13" "test@example.com" "Test User" "Test project" "true" "true" "true"
+test_config "fastapi-custom-dest" "test-fastapi-dest" "fastapi" "/tmp" "3.13" "test@example.com" "Test User" "Test project" "true" "true" "true" "sqlalchemy"
+
+echo "Testing FastAPI with MongoDB..."
+test_config "fastapi-mongodb" "test-fastapi-mongodb" "fastapi" "$TEST_DIR" "3.13" "test@example.com" "Test User" "Test project" "true" "true" "true" "mongodb"
+
+echo "Testing FastAPI with MongoDB and no cloud..."
+test_config "fastapi-mongodb-no-cloud" "test-fastapi-mongodb-no-cloud" "fastapi" "$TEST_DIR" "3.13" "test@example.com" "Test User" "Test project" "true" "false" "true" "mongodb"
 
 echo "🧪 Testing complete!"

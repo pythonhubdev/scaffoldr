@@ -1,3 +1,4 @@
+{% if database_type == 'sqlalchemy' %}
 from collections.abc import AsyncGenerator, Callable
 from functools import wraps
 from typing import Any, cast
@@ -74,3 +75,44 @@ def inject_session(func: Callable[..., Any]) -> Callable[..., Any]:
 		return None  # This should never be reached, but for type safety
 
 	return cast("Callable[..., Any]", wrapper)
+{% elif database_type == 'mongodb' %}
+from beanie import init_beanie
+from motor.motor_asyncio import AsyncIOMotorClient
+from typing import Optional
+
+from {{ project_slug }}.core.config import settings
+
+
+class MongoDB:
+	"""MongoDB connection manager using Beanie ODM."""
+
+	def __init__(self) -> None:
+		"""Initialize the MongoDB connection."""
+		self.client: Optional[AsyncIOMotorClient] = None
+		self.database = None
+
+	async def connect(self) -> None:
+		"""Connect to MongoDB and initialize Beanie."""
+		self.client = AsyncIOMotorClient(settings.database.URL)
+		self.database = self.client[settings.database.DATABASE_NAME]
+
+		# Initialize Beanie with document models
+		# Note: Document models should be imported here when they exist
+		await init_beanie(
+			database=self.database,
+			document_models=[],  # Add your document models here
+		)
+
+	async def close(self) -> None:
+		"""Close the MongoDB connection."""
+		if self.client:
+			self.client.close()
+
+	async def get_database(self):
+		"""Get the database instance."""
+		return self.database
+
+
+# Global MongoDB instance
+mongodb = MongoDB()
+{% endif %}

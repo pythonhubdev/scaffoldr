@@ -4,7 +4,11 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 {% if database %}
+{% if database_type == 'sqlalchemy' %}
 from {{ project_slug }}.connection import Base, database
+{% elif database_type == 'mongodb' %}
+from {{ project_slug }}.connection import mongodb
+{% endif %}
 {% endif %}
 
 {% if framework == 'fastapi' %}
@@ -12,10 +16,19 @@ from {{ project_slug }}.connection import Base, database
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
 {% if database %}
+{% if database_type == 'sqlalchemy' %}
 	async with database.engine.begin() as conn:
 		# run_sync executes the given function in a sync context using the connection
 		await conn.run_sync(Base.metadata.create_all)
-	{% endif %}
+{% elif database_type == 'mongodb' %}
+	await mongodb.connect()
+{% endif %}
+{% endif %}
 	yield
+{% if database %}
+{% if database_type == 'mongodb' %}
+	await mongodb.close()
+{% endif %}
+{% endif %}
 
 {% endif %}

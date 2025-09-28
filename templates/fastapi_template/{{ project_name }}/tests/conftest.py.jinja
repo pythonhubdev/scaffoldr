@@ -4,11 +4,16 @@ from typing import Generator
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from {{ project_slug }}.api.application import app
 {% if database %}
+{% if database_type == 'sqlalchemy' %}
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from {{ project_slug }}.connection import database
+{% elif database_type == 'mongodb' %}
+from {{ project_slug }}.connection import mongodb
+{% endif %}
 {% endif %}
 
 
@@ -28,6 +33,7 @@ def client() -> Generator[TestClient, None, None]:
 
 
 {% if database %}
+{% if database_type == 'sqlalchemy' %}
 @pytest.fixture(scope="function")
 async def db_session() -> AsyncGenerator[AsyncSession, None]:
 	"""Create a database session for testing."""
@@ -40,4 +46,14 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
 		except Exception:
 			await session.rollback()
 			raise
+{% elif database_type == 'mongodb' %}
+@pytest.fixture(scope="function")
+async def mongodb_client():
+	"""Create a MongoDB client for testing."""
+	await mongodb.connect()
+	try:
+		yield mongodb
+	finally:
+		await mongodb.close()
+{% endif %}
 {% endif %}

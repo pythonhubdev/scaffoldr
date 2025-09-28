@@ -18,3 +18,8 @@ class CloudTypes(str, Enum):
 	GCP = "gcp"
 	AZURE = "azure"
 	NONE = "none"
+
+
+class DatabaseTypes(str, Enum):
+	SQLALCHEMY = "sqlalchemy"
+	MONGODB = "mongodb"

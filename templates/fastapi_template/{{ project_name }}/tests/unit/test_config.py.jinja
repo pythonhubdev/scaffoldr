@@ -39,6 +39,7 @@ class TestSettings:
 		assert settings.server.PORT > 0
 
 	{% if database %}
+	{% if database_type == 'sqlalchemy' %}
 	def test_database_settings(self) -> None:
 		"""Test database settings have expected attributes."""
 		settings = get_settings()
@@ -47,4 +48,14 @@ class TestSettings:
 		assert isinstance(settings.database.URL, str)
 		assert isinstance(settings.database.ECHO, bool)
 		assert "sqlite" in settings.database.URL  # Should contain sqlite for basic setup
+	{% elif database_type == 'mongodb' %}
+	def test_database_settings(self) -> None:
+		"""Test MongoDB database settings have expected attributes."""
+		settings = get_settings()
+		assert hasattr(settings.database, 'URL')
+		assert hasattr(settings.database, 'DATABASE_NAME')
+		assert isinstance(settings.database.URL, str)
+		assert isinstance(settings.database.DATABASE_NAME, str)
+		assert "mongodb" in settings.database.URL  # Should contain mongodb for MongoDB setup
+	{% endif %}
 	{% endif %}
