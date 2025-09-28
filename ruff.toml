@@ -2,6 +2,7 @@ fix = true
 line-length = 100
 target-version = "py313"
 indent-width = 4
+exclude = [".venv", "/templates"]
 
 [format]
 docstring-code-format = true
@@ -11,7 +12,7 @@ quote-style = "double"
 skip-magic-trailing-comma = false
 
 [lint]
-exclude = ["migrations/versions/*", ".venv", "tests", "src/scaffoldr/templates"]
+exclude = ["migrations/versions/*", ".venv"]
 ignore = [
 	"E712", # equality comparison messes with SQL
 	"RUF003", # quotes in comment

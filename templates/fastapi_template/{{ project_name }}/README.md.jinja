@@ -10,7 +10,7 @@
 - **Alembic**: Database migration tool
 - **Uvicorn**: ASGI web server
 - **Granian**: High-performance web server
-  {% if use_s3 %}
+  {% if cloud_type == 'aws' %}
 - **AWS S3**: File storage integration
   {% endif %}
 

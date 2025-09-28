@@ -45,7 +45,7 @@ def granian(
 		show_default=True,
 	),
 	loc: str = typer.Option(
-		"src.{{ project_name }}.api.application:app",
+		"src.{{ project_slug }}.api.application:app",
 		"--app",
 		"-a",
 		help="Location of the FastAPI application to run.",

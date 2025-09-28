@@ -6,6 +6,7 @@ import typer
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
 from scaffoldr.core.constants import Frameworks, console
+from scaffoldr.core.utils.helper import Helper
 
 
 class GenerateCommand:
@@ -21,6 +22,8 @@ class GenerateCommand:
 		name: str,
 		description: str,
 		docker: bool,
+		use_cloud: bool,
+		use_database: bool,
 	) -> None:
 		"""Generate a new project with the specified framework."""
 		# Validate framework
@@ -31,14 +34,23 @@ class GenerateCommand:
 			)
 			raise typer.Exit(1)
 
+		cloud_type = "none"
+		if use_cloud:
+			cloud_type = Helper.cloud_type()
+
+		project_name = project_name.replace(" ", "-").lower()
 		# Check if directory already exists
-		project_dir = Path(destination) / project_name
+		if destination == ".":
+			project_dir = Path.cwd() / project_name
+		else:
+			project_dir = Path(destination) / project_name
+
 		if project_dir.exists():
 			console.print(f"[red]Error:[/red] Directory '{project_name}' already exists.")
 			raise typer.Exit(1)
 
 		# Get template path
-		template_path = Path(__file__).parent.parent / "templates" / f"{framework}_template"
+		template_path = Path(__file__).parent / "templates" / f"{framework}_template"
 
 		if not template_path.exists():
 			console.print(
@@ -46,20 +58,17 @@ class GenerateCommand:
 			)
 			raise typer.Exit(1)
 
-		console.print(
-			f"[green]Generating {project_name} with {framework} framework...[/green]",
-		)
-
 		# Prepare copier data
 		data = {
-			"project_name": project_name.replace(" ", "-").lower(),
-			"project_slug": project_name.lower().replace(" ", "_").replace("-", "-"),
+			"project_name": project_name,
+			"project_slug": project_name.replace("-", "_"),
 			"author_name": name,
 			"author_email": email,
 			"description": description,
 			"python_version": python_version,
 			"use_docker": docker,
-			"use_s3": False,
+			"cloud_type": cloud_type,
+			"database": use_database,
 		}
 
 		try:
@@ -81,8 +90,10 @@ class GenerateCommand:
 				progress.update(
 					task,
 					completed=True,
-					description="Template copied successfully!",
+					description=f"Generating project {project_name} with {framework} framework...",
 				)
+
+			Helper.post_hook(str(project_dir))
 
 			console.print(
 				f"[green]✅ Project '{project_name}' generated successfully![/green]",
@@ -90,9 +101,8 @@ class GenerateCommand:
 			console.print(
 				f"[blue]📁 Change to the project directory:[/blue] cd {project_name}",
 			)
-			console.print("[blue]📦 Install dependencies:[/blue] pip install -e .")
 			console.print(
-				f"[blue]🚀 Run the application:[/blue] {data['project_slug']} dev",
+				f"[blue]🚀 Run the application:[/blue] uv run {data['project_slug']}",
 			)
 
 		except Exception as exception:
@@ -118,7 +128,7 @@ def generate(
 		typer.Option(
 			"--destination",
 			"-dest",
-			help="Destination directory for the new project don't include project name",
+			help="Destination directory for the new project don't include project name. Please provide full path or '.' for current directory",
 			prompt=True,
 		),
 	] = ".",
@@ -130,7 +140,7 @@ def generate(
 			help="Python version to use",
 			prompt=True,
 		),
-	] = "3.11",
+	] = "3.13",
 	email: Annotated[
 		str,
 		typer.Option(
@@ -166,6 +176,22 @@ def generate(
 			prompt=True,
 		),
 	] = True,
+	use_cloud: Annotated[
+		bool,
+		typer.Option(
+			"--use-cloud/--no-cloud",
+			help="Include cloud support (e.g., AWS S3)",
+			prompt=True,
+		),
+	] = True,
+	use_database: Annotated[
+		bool,
+		typer.Option(
+			"--use-database/--no-database",
+			help="Include database support (e.g., PostgreSQL)",
+			prompt=True,
+		),
+	] = True,
 ) -> None:
 	"""Generate a new project with the specified framework."""
 	# Validate framework
@@ -178,4 +204,6 @@ def generate(
 		name,
 		description,
 		docker,
+		use_cloud,
+		use_database,
 	)

@@ -52,11 +52,11 @@ class LogSettings(BaseSettings):
 	def granian_log_level(self) -> Self:
 		if not self.GRANIAN_LOG_LEVEL:
 			level_name = logging.getLevelName(self.LEVEL)
-			self.GRANIAN_LOG_LEVEL = GRANIAN_LOG_MAPPING.get(level_name, LogLevels.info)
+			self.GRANIAN_LOG_LEVEL = GRANIAN_LOG_MAPPING.get(level_name, LogLevels.info) # type: ignore
 		return self
 
 	model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
-		env_prefix="{{project_slug}}_LOG_",
+		env_prefix="{{ project_slug|upper }}_LOG_",
 	)
 
 
@@ -83,7 +83,7 @@ class AppSettings(BaseSettings):
 	model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
 		extra="ignore",
 		env_file=".env",
-		env_prefix="{{ project_slug }}_APP_",
+		env_prefix="{{ project_slug|upper }}_APP_",
 		env_file_encoding="utf-8",
 	)
 
@@ -97,7 +97,7 @@ class ServerSettings(BaseSettings):
 	model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
 		extra="ignore",
 		env_file=".env",
-		env_prefix="{{ project_slug }}_SERVER_",
+		env_prefix="{{ project_slug|upper }}_SERVER_",
 		env_file_encoding="utf-8",
 	)
 
@@ -111,7 +111,7 @@ class CloudSettings(BaseSettings):
 	model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
 		extra="ignore",
 		env_file=".env",
-		env_prefix="{{ project_slug }}_CLOUD_",
+		env_prefix="{{ project_slug|upper }}_CLOUD_",
 		env_file_encoding="utf-8",
 	)
 
@@ -126,7 +126,7 @@ class DatabaseSettings(BaseSettings):
 	model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
 		extra="ignore",
 		env_file=".env",
-		env_prefix="{{ project_slug }}_DB_",
+		env_prefix="{{ project_slug|upper }}_DB_",
 		env_file_encoding="utf-8",
 	)
 

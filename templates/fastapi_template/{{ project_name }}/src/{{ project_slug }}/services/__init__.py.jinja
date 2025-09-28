@@ -1,0 +1,17 @@
+from {{ project_slug }}.services.repositories.storage_repository import (
+	FileInfo,
+	StorageRepository,
+	UploadResult,
+)
+{% if cloud_type == 'aws' %}
+from {{ project_slug }}.services.s3_service import S3StorageService
+{% endif %}
+
+__all__ = [
+	"FileInfo",
+	{% if cloud_type == 'aws' %}
+	"S3StorageService",
+	{% endif %}
+	"StorageRepository",
+	"UploadResult",
+]

@@ -1,0 +1,109 @@
+from abc import ABC, abstractmethod
+from collections.abc import AsyncGenerator
+from typing import BinaryIO
+from {{ project_slug }}.schema import FileInfo, UploadResult
+
+
+
+class StorageRepository(ABC):
+	"""Abstract base class for storage repositories."""
+
+	@abstractmethod
+	async def upload(
+		self,
+		file: BinaryIO,
+		key: str,
+		content_type: str | None = None,
+		metadata: dict[str, str] | None = None,
+	) -> UploadResult:
+		"""
+		Upload a file to storage.
+
+		Args:
+			file: The file-like object to upload
+			key: The key/path where to store the file
+			content_type: The MIME type of the file
+			metadata: Optional metadata to store with the file
+
+		Returns:
+			UploadResult with file information
+
+		"""
+
+	@abstractmethod
+	async def download(self, key: str) -> AsyncGenerator[bytes]:
+		"""
+		Download a file from storage.
+
+		Args:
+			key: The key/path of the file to download
+
+		Yields:
+			Chunks of file data
+
+		"""
+
+	@abstractmethod
+	async def get_presigned_url(
+		self,
+		key: str,
+		expiration: int = 3600,
+		operation: str = "get_object",
+	) -> str:
+		"""
+		Generate a presigned URL for file access.
+
+		Args:
+			key: The key/path of the file
+			expiration: URL expiration time in seconds (default 1 hour)
+			operation: The operation type ('get_object' or 'put_object')
+
+		Returns:
+			Presigned URL string
+
+		"""
+
+	@abstractmethod
+	async def list_files(
+		self,
+		prefix: str | None = None,
+		max_keys: int = 1000,
+	) -> list[FileInfo]:
+		"""
+		List files in a path/prefix.
+
+		Args:
+			prefix: The prefix/path to list files from
+			max_keys: Maximum number of files to return
+
+		Returns:
+			List of FileInfo objects
+
+		"""
+
+	@abstractmethod
+	async def get_file_info(self, key: str) -> FileInfo:
+		"""
+		Get information about a specific file.
+
+		Args:
+			key: The key/path of the file
+
+		Returns:
+			FileInfo object with file details
+
+		"""
+
+	@abstractmethod
+	async def delete_file(self, key: str) -> bool:
+		"""
+		Delete a file from storage.
+
+		Args:
+			key: The key/path of the file to delete
+
+		Returns:
+			True if deletion was successful
+
+		"""
+		...

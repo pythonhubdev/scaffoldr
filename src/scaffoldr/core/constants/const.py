@@ -11,3 +11,10 @@ class Frameworks(str, Enum):
 	FLASK = "flask"
 	QUARTZ = "quartz"
 	ROBYN = "robyn"
+
+
+class CloudTypes(str, Enum):
+	AWS = "aws"
+	GCP = "gcp"
+	AZURE = "azure"
+	NONE = "none"

@@ -22,6 +22,7 @@ repos:
                     - --branch
                     - master
                 id: no-commit-to-branch
+
         repo: https://github.com/pre-commit/pre-commit-hooks
         rev: v6.0.0
     -   hooks:
@@ -32,6 +33,7 @@ repos:
             -   args:
                     - --py313-plus
                 id: pyupgrade
+
         repo: https://github.com/asottile/pyupgrade
         rev: v3.20.0
     -   hooks:
@@ -44,7 +46,7 @@ repos:
                     - python
         repo: local
     -   hooks:
-            -   entry: uv run ruff check
+            -   entry: uv run ruff check src
                 id: lint
                 language: system
                 name: lint
@@ -52,11 +54,6 @@ repos:
                 types:
                     - python
         repo: local
-    -   hooks:
-            -   id: mypy
-        repo: https://github.com/pre-commit/mirrors-mypy
-        rev: v1.18.2
-        args:
 
     -   hooks:
             -   entry: uv run basedpyright

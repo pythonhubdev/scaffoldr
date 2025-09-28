@@ -1,0 +1,206 @@
+from collections.abc import AsyncGenerator
+from typing import TYPE_CHECKING, Any, BinaryIO
+
+import aioboto3
+
+from {{ project_slug }}.core.config import settings
+from {{ project_slug }}.services.repositories.storage_repository import (
+	FileInfo,
+	StorageRepository,
+	UploadResult,
+)
+
+if TYPE_CHECKING:
+	from boto3 import Session
+
+
+class S3StorageService(StorageRepository):
+	"""AWS S3 implementation of StorageRepository using aioboto3."""
+
+	def __init__(
+		self,
+	) -> None:
+		"""
+		Initialize S3 storage repository.
+		"""
+		self.bucket_name: str = settings.cloud.BUCKET_NAME
+		self.region_name: str = settings.cloud.REGION_NAME
+		self.aws_access_key_id: str = settings.cloud.ACCESS_KEY
+		self.aws_secret_access_key: str = settings.cloud.SECRET_KEY
+
+		self.session: Session = aioboto3.Session()
+
+	async def _get_client(self) -> Any:
+		"""Get an async S3 client."""
+		return self.session.client(
+			"s3",
+			region_name=self.region_name,
+			aws_access_key_id=self.aws_access_key_id,
+			aws_secret_access_key=self.aws_secret_access_key,
+		)
+
+	async def upload(
+		self,
+		file: BinaryIO | bytes,
+		key: str,
+		content_type: str | None = None,
+		metadata: dict[str, str] | None = None,
+	) -> UploadResult:
+		"""
+		Upload a file to S3.
+
+		Args:
+			file: The file-like object to upload
+			key: The key/path where to store the file
+			content_type: The MIME type of the file
+			metadata: Optional metadata to store with the file
+
+		Returns:
+			UploadResult with file information
+
+		"""
+		async with await self._get_client() as client:
+			upload_params: dict[str, Any] = {
+				"Bucket": self.bucket_name,
+				"Key": key,
+				"Body": file,
+			}
+
+			if content_type:
+				upload_params["ContentType"] = content_type
+
+			if metadata:
+				upload_params["Metadata"] = metadata
+
+			response = await client.put_object(**upload_params)
+
+			return UploadResult(
+				key=key,
+				etag=response["ETag"].strip('"'),
+				version_id=response.get("VersionId"),
+			)
+
+	async def download(self, key: str) -> AsyncGenerator[bytes]:  # type: ignore[override]
+		"""
+		Download a file from S3.
+
+		Args:
+			key: The key/path of the file to download
+
+		Yields:
+			Chunks of file data
+
+		"""
+		async with await self._get_client() as client:
+			response = await client.get_object(Bucket=self.bucket_name, Key=key)
+
+			async for chunk in response["Body"]:
+				yield chunk
+
+	async def get_presigned_url(
+		self,
+		key: str,
+		expiration: int = 3600,
+		operation: str = "get_object",
+	) -> str:
+		"""
+		Generate a presigned URL for S3 file access.
+
+		Args:
+			key: The key/path of the file
+			expiration: URL expiration time in seconds (default 1 hour)
+			operation: The operation type ('get_object' or 'put_object')
+
+		Returns:
+			Presigned URL string
+
+		"""
+		async with await self._get_client() as client:
+			url = await client.generate_presigned_url(
+				operation,
+				Params={"Bucket": self.bucket_name, "Key": key},
+				ExpiresIn=expiration,
+			)
+			return url
+
+	async def list_files(
+		self,
+		prefix: str | None = None,
+		max_keys: int = 1000,
+	) -> list[FileInfo]:
+		"""
+		List files in S3 bucket with optional prefix.
+
+		Args:
+			prefix: The prefix/path to list files from
+			max_keys: Maximum number of files to return
+
+		Returns:
+			List of FileInfo objects
+
+		"""
+		async with await self._get_client() as client:
+			list_params = {
+				"Bucket": self.bucket_name,
+				"MaxKeys": max_keys,
+			}
+
+			if prefix:
+				list_params["Prefix"] = prefix
+
+			response = await client.list_objects_v2(**list_params)
+
+			files = []
+			if "Contents" in response:
+				for obj in response["Contents"]:
+					files.append(
+						FileInfo(
+							key=obj["Key"],
+							size=obj["Size"],
+							last_modified=obj["LastModified"].isoformat(),
+							etag=obj["ETag"].strip('"'),
+							content_type=None,
+						),
+					)
+
+			return files
+
+	async def get_file_info(self, key: str) -> FileInfo:
+		"""
+		Get information about a specific S3 file.
+
+		Args:
+			key: The key/path of the file
+
+		Returns:
+			FileInfo object with file details
+
+		"""
+		async with await self._get_client() as client:
+			response = await client.head_object(Bucket=self.bucket_name, Key=key)
+
+			return FileInfo(
+				key=key,
+				size=response["ContentLength"],
+				last_modified=response["LastModified"].isoformat(),
+				etag=response["ETag"].strip('"'),
+				content_type=response.get("ContentType"),
+			)
+
+	async def delete_file(self, key: str) -> bool:
+		"""
+		Delete a file from S3.
+
+		Args:
+			key: The key/path of the file to delete
+
+		Returns:
+			True if deletion was successful
+
+		"""
+		async with await self._get_client() as client:
+			try:
+				await client.delete_object(Bucket=self.bucket_name, Key=key)
+				return True
+			except Exception:
+				return False

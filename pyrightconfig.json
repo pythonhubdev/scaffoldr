@@ -9,7 +9,7 @@
 		"dist",
 		"build",
 		".git",
-		"src/scaffoldr/templates"
+		"templates"
 	],
 	"defineConstant": {
 		"DEBUG": true
