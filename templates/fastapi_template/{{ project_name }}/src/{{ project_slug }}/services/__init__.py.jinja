@@ -1,21 +1,22 @@
 from {{ project_slug }}.services.repositories.storage_repository import (
-	FileInfo,
 	StorageRepository,
-	UploadResult,
 )
+
 {% if cloud_type == 'aws' %}
 from {{ project_slug }}.services.s3_service import S3StorageService
 {% elif cloud_type == 'gcp' %}
 from {{ project_slug }}.services.gcp_service import GCPStorageService
+{%  elif cloud_type == 'azure' %}
+from {{ project_slug }}.services.azure_service import AzureStorageService
 {% endif %}
 
 __all__ = [
-	"FileInfo",
 	{% if cloud_type == 'aws' %}
 	"S3StorageService",
 	{% elif cloud_type == 'gcp' %}
 	"GCPStorageService",
+	{%  elif cloud_type == 'azure' %}
+	"AzureStorageService",
 	{% endif %}
 	"StorageRepository",
-	"UploadResult",
 ]

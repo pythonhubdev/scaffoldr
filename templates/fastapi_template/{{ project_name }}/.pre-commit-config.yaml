@@ -19,11 +19,10 @@ repos:
             -   id: check-yaml
                 exclude: ^k8s/
             -   id: check-toml
+            -   id: no-commit-to-branch
+                args: [ "--branch", "main", "--branch", "master" ]
 
     -   repo: https://github.com/asottile/add-trailing-comma
-    -   id: no-commit-to-branch
-        args: [ "--branch", "main", "--branch", "master" ]
-
         rev: v3.2.0
         hooks:
             -   id: add-trailing-comma
@@ -32,8 +31,8 @@ repos:
         rev: v3.20.0
         hooks:
             -   id: pyupgrade
-                args:
-                    - --py313-plus
+                args: [ "--py313-plus" ]
+
     -   repo: local
         hooks:
             -   id: format
@@ -52,7 +51,7 @@ repos:
                 language: system
                 types:
                     - python
-                    -
+
     -   repo: https://github.com/pre-commit/mirrors-mypy
         rev: v1.18.2
         hooks:
