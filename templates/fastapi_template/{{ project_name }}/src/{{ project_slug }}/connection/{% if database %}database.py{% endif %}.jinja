@@ -2,9 +2,12 @@ from collections.abc import AsyncGenerator, Callable
 from functools import wraps
 from typing import Any, cast
 
-from {{ project_slug }}.core.config import settings
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
+from {{ project_slug }}.core.config import settings
+
+Base = declarative_base()
 
 class Database:
 	"""Database connection manager for async SQLAlchemy operations."""
@@ -71,8 +74,3 @@ def inject_session(func: Callable[..., Any]) -> Callable[..., Any]:
 		return None  # This should never be reached, but for type safety
 
 	return cast("Callable[..., Any]", wrapper)
-
-
-__all__ = [
-	"inject_session",
-]
