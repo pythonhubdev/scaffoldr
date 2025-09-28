@@ -1,13 +1,13 @@
 repos:
-#    -   hooks:
-#            -   always_run: true
-#                entry: .hooks/branch
-#                id: branch-naming
-#                language: script
-#                name: Branch naming convention check
-#                stages:
-#                    - pre-commit
-#        repo: local
+    -   hooks:
+            -   always_run: true
+                entry: .hooks/branch
+                id: branch-naming
+                language: script
+                name: Branch naming convention check
+                stages:
+                    - pre-commit
+        repo: local
     -   hooks:
             -   id: check-ast
                 language_version: python3.13
@@ -17,11 +17,12 @@ repos:
                 id: check-yaml
             -   id: check-toml
             -   args:
-#                    - --branch
-#                    - main
+                    - --branch
+                    - main
                     - --branch
                     - master
                 id: no-commit-to-branch
+
         repo: https://github.com/pre-commit/pre-commit-hooks
         rev: v6.0.0
     -   hooks:
@@ -32,6 +33,7 @@ repos:
             -   args:
                     - --py313-plus
                 id: pyupgrade
+
         repo: https://github.com/asottile/pyupgrade
         rev: v3.20.0
     -   hooks:
@@ -44,7 +46,7 @@ repos:
                     - python
         repo: local
     -   hooks:
-            -   entry: uv run ruff check
+            -   entry: uv run ruff check src
                 id: lint
                 language: system
                 name: lint
@@ -52,10 +54,7 @@ repos:
                 types:
                     - python
         repo: local
-    -   hooks:
-            -   id: mypy
-        repo: https://github.com/pre-commit/mirrors-mypy
-        rev: v1.18.2
+
     -   hooks:
             -   entry: uv run basedpyright
                 id: pyright

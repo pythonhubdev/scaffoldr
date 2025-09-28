@@ -1,0 +1,104 @@
+# {{project_name}}
+
+{{description}}
+
+## Features
+
+- **FastAPI**: Modern, fast web framework for building APIs
+- **Pydantic**: Data validation and serialization
+- **SQLAlchemy**: SQL toolkit and ORM
+- **Alembic**: Database migration tool
+- **Uvicorn**: ASGI web server
+- **Granian**: High-performance web server
+  {% if cloud_type == 'aws' %}
+- **AWS S3**: File storage integration
+  {% elif cloud_type == 'gcp' %}
+- **Google Cloud Storage**: File storage integration
+  {% endif %}
+
+## Quick Start
+
+1. Install dependencies:
+   ```bash
+   uv sync
+   ```
+
+2. Run the development server:
+   ```bash
+   uv run {{project_slug}}
+   ```
+
+3. Open your browser to `http://localhost:8000`
+
+## API Documentation
+
+Once the server is running, visit `http://localhost:8000/docs` for the interactive API documentation.
+
+## Project Structure
+
+```
+src/
+├── __main__.py                 # Application entry point
+└── {{project_slug}}/
+    ├── api/                    # API layer configuration
+    ├── core/                   # Core application components
+    ├── database/               # Data access layer
+    ├── errors/                 # Custom exception classes
+    ├── features/               # Feature modules (business logic)
+    ├── schema/                 # Global schemas
+    └── services/               # External service integrations
+```
+
+## Development
+
+### Setup
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   uv sync --extra dev
+   ```
+3. Run pre-commit hooks:
+   ```bash
+   pre-commit install
+   ```
+
+### Commands
+
+- `uv run {{project_slug}}` - Run development server
+
+### Testing
+
+```bash
+# Run all tests
+uv run pytest
+
+# Run unit tests only
+uv run pytest -m unit
+
+# Run integration tests only
+uv run pytest -m integration
+
+# Run tests with coverage
+uv run pytest --cov=src --cov-report=html
+```
+
+### Test Structure
+
+```
+tests/
+├── conftest.py              # Test configuration and fixtures
+├── test_app.py              # Basic application tests
+├── test_health.py           # Health check tests
+├── unit/                    # Unit tests
+│   └── test_config.py       # Configuration tests
+└── integration/            # Integration tests
+    └── test_api.py          # API integration tests
+```
+
+### Code Quality
+
+```bash
+uv run ruff check .
+uv run mypy .
+```

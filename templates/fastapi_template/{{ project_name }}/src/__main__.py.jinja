@@ -1,0 +1,12 @@
+from {{ project_slug }}.api import GranianApplication
+from {{ project_slug }}.core.utils import LoggingConfig
+
+
+def main() -> None:
+	"""Entrypoint of the application."""
+	LoggingConfig.configure_logging()
+	GranianApplication.run()
+
+
+if __name__ == "__main__":
+	main()

@@ -1,0 +1,37 @@
+from pathlib import Path
+
+from granian import Granian
+from granian.constants import Interfaces
+
+from {{ project_slug }}.core.config import settings
+
+
+class GranianApplication:
+	"""
+	Custom Granian application.
+
+	This class is used to start Granian with the Litestar application.
+	"""
+
+	@staticmethod
+	def run() -> None:
+		"""Run the FastAPI application with Granian."""
+		# Prepare SSL parameters based on the SSL context
+
+		granian_app = Granian(
+			target=settings.server.APP_LOCATION,
+			interface=Interfaces.ASGI,
+			address=settings.server.HOST,
+			port=settings.server.PORT,
+			reload_paths=[Path("src")],
+			workers=settings.server.HTTP_WORKERS,
+			reload=settings.app.DEBUG,
+			log_access=False,
+			log_enabled=False,
+			log_level=settings.log.GRANIAN_LOG_LEVEL,
+		)
+		granian_app.serve()
+
+
+if __name__ == "__main__":
+	GranianApplication.run()

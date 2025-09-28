@@ -58,10 +58,6 @@ scaffoldr generate my-api
 
 # Generate with specific framework
 scaffoldr generate my-api --framework fastapi
-scaffoldr generate my-flask-app --framework flask
-
-# Generate with additional options
-scaffoldr generate my-project --framework fastapi --database postgres --auth jwt
 
 # Get help
 scaffoldr --help
@@ -70,6 +66,21 @@ scaffoldr generate --help
 # Disable the animated banner
 scaffoldr --no-banner generate my-project
 ```
+
+### Generated Project Features
+
+When you generate a FastAPI project, you get:
+
+- **Complete FastAPI Application**: Pre-configured with proper structure
+- **Database Integration**: SQLAlchemy with Alembic migrations
+- **File Storage**: Built-in file upload/download endpoints
+- **API Documentation**: Auto-generated OpenAPI/Swagger docs
+- **Development Tools**: Pre-configured with ruff, mypy, pytest
+- **Docker Support**: Ready-to-use Docker configuration
+- **Environment Management**: .env support with validation
+- **Logging**: Structured logging with proper middleware
+- **Error Handling**: Comprehensive exception handling
+- **Testing**: Test structure with fixtures and examples
 
 ### ✨ Animated Banner
 

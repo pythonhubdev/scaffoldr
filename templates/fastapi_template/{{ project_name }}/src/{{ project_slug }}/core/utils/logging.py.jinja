@@ -1,0 +1,77 @@
+import logging
+import sys
+
+import structlog
+from structlog.contextvars import merge_contextvars
+from structlog.processors import (
+	CallsiteParameter,
+	CallsiteParameterAdder,
+	StackInfoRenderer,
+	TimeStamper,
+	UnicodeDecoder,
+	dict_tracebacks,
+	format_exc_info,
+)
+from structlog.stdlib import (
+	BoundLogger,
+	PositionalArgumentsFormatter,
+	ProcessorFormatter,
+	add_log_level,
+	add_logger_name,
+)
+
+from {{ project_slug}}.core.config import settings
+
+
+class LoggingConfig:
+	@staticmethod
+	def configure_logging() -> None:
+		timestamper = TimeStamper(fmt="%Y-%m-%d %H:%M:%S", utc=True)
+		common_processors = [
+			merge_contextvars,
+			add_logger_name,
+			add_log_level,
+			PositionalArgumentsFormatter(),
+			timestamper,
+			CallsiteParameterAdder(
+				parameters=[
+					CallsiteParameter.MODULE,
+					CallsiteParameter.FUNC_NAME,
+					CallsiteParameter.LINENO,
+				],
+			),
+			StackInfoRenderer(),
+			format_exc_info,
+			UnicodeDecoder(),
+			dict_tracebacks,
+		]
+
+		console_formatter = ProcessorFormatter(
+			foreign_pre_chain=common_processors,  # type: ignore[arg-type]
+			processor=structlog.dev.ConsoleRenderer(colors=True),
+		)
+
+		handler = logging.StreamHandler(sys.stdout)
+		handler.setFormatter(console_formatter)
+
+		root = logging.getLogger()
+		root.handlers.clear()
+		root.addHandler(handler)
+		root.setLevel(settings.log.LEVEL)
+
+		structlog.configure(
+			processors=[
+				structlog.stdlib.filter_by_level,
+				*common_processors,  # type: ignore[list-item]
+				ProcessorFormatter.wrap_for_formatter,
+			],
+			context_class=dict,
+			logger_factory=structlog.stdlib.LoggerFactory(),
+			wrapper_class=BoundLogger,  # type: ignore
+			cache_logger_on_first_use=True,
+		)
+
+
+logger: BoundLogger = structlog.get_logger().bind()
+stage_logger: BoundLogger = structlog.get_logger().bind(stage="STAGE")
+end_stage_logger: BoundLogger = structlog.get_logger().bind(stage="END STAGE")

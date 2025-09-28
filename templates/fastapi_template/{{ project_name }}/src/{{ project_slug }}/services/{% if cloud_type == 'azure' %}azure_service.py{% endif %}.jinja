@@ -1,0 +1,223 @@
+from collections.abc import AsyncGenerator
+from typing import TYPE_CHECKING, Any, BinaryIO
+
+from azure.storage.blob import BlobSasPermissions, BlobServiceClient, generate_blob_sas
+from azure.storage.blob.aio import BlobServiceClient as AsyncBlobServiceClient
+from datetime import datetime, timedelta
+
+from {{ project_slug }}.core.config import settings
+from {{ project_slug }}.services.repositories.storage_repository import (
+	FileInfo,
+	StorageRepository,
+	UploadResult,
+)
+
+if TYPE_CHECKING:
+	pass
+
+
+class AzureStorageService(StorageRepository):
+	"""Azure Blob Storage implementation of StorageRepository."""
+
+	def __init__(
+		self,
+	) -> None:
+		"""
+		Initialize Azure storage repository.
+		"""
+		self.container_name: str = settings.cloud.CONTAINER_NAME
+		self.account_name: str = settings.cloud.ACCOUNT_NAME
+		self.account_key: str = settings.cloud.ACCOUNT_KEY
+
+		# Initialize the async client
+		account_url = f"https://{self.account_name}.blob.core.windows.net"
+		self.client = AsyncBlobServiceClient(
+			account_url=account_url, credential=self.account_key
+		)
+
+	async def upload(
+		self,
+		file: BinaryIO | bytes,
+		key: str,
+		content_type: str | None = None,
+		metadata: dict[str, str] | None = None,
+	) -> UploadResult:
+		"""
+		Upload a file to Azure Blob Storage.
+
+		Args:
+			file: The file-like object to upload
+			key: The key/path where to store the file
+			content_type: The MIME type of the file
+			metadata: Optional metadata to store with the file
+
+		Returns:
+			UploadResult with file information
+
+		"""
+		blob_client = self.client.get_blob_client(
+			container=self.container_name, blob=key
+		)
+
+		upload_options = {}
+		if content_type:
+			upload_options["content_type"] = content_type
+
+		if metadata:
+			upload_options["metadata"] = metadata
+
+		if isinstance(file, bytes):
+			response = await blob_client.upload_blob(
+				file, overwrite=True, **upload_options
+			)
+		else:
+			response = await blob_client.upload_blob(
+				file, overwrite=True, **upload_options
+			)
+
+		return UploadResult(
+			key=key,
+			etag=response.get("etag", ""),
+			version_id=None,  # Azure doesn't use version IDs like S3
+		)
+
+	async def download(self, key: str) -> AsyncGenerator[bytes]:  # type: ignore[override]
+		"""
+		Download a file from Azure Blob Storage.
+
+		Args:
+			key: The key/path of the file to download
+
+		Yields:
+			Chunks of file data
+
+		"""
+		blob_client = self.client.get_blob_client(
+			container=self.container_name, blob=key
+		)
+
+		download_stream = await blob_client.download_blob()
+
+		# Read in chunks
+		chunk_size = 1024 * 1024  # 1MB chunks
+		async for chunk in download_stream.chunks():
+			yield chunk
+
+	async def get_presigned_url(
+		self,
+		key: str,
+		expiration: int = 3600,
+		operation: str = "get_object",
+	) -> str:
+		"""
+		Generate a SAS URL for Azure Blob access.
+
+		Args:
+			key: The key/path of the file
+			expiration: URL expiration time in seconds (default 1 hour)
+			operation: The operation type ('get_object' or 'put_object')
+
+		Returns:
+			SAS URL string
+
+		"""
+		expiry_time = datetime.utcnow() + timedelta(seconds=expiration)
+
+		if operation == "put_object":
+			permission = BlobSasPermissions(write=True)
+		else:
+			permission = BlobSasPermissions(read=True)
+
+		sas_token = generate_blob_sas(
+			account_name=self.account_name,
+			container_name=self.container_name,
+			blob_name=key,
+			account_key=self.account_key,
+			permission=permission,
+			expiry=expiry_time,
+		)
+
+		blob_client = self.client.get_blob_client(
+			container=self.container_name, blob=key
+		)
+		return f"{blob_client.url}?{sas_token}"
+
+	async def list_files(
+		self,
+		prefix: str | None = None,
+		max_keys: int = 1000,
+	) -> list[FileInfo]:
+		"""
+		List files in Azure container with optional prefix.
+
+		Args:
+			prefix: The prefix/path to list files from
+			max_keys: Maximum number of files to return
+
+		Returns:
+			List of FileInfo objects
+
+		"""
+		container_client = self.client.get_container_client(self.container_name)
+
+		files = []
+		async for blob in container_client.list_blobs(name_starts_with=prefix):
+			files.append(
+				FileInfo(
+					key=blob.name,
+					size=blob.size or 0,
+					last_modified=blob.last_modified.isoformat() if blob.last_modified else "",
+					etag=blob.etag or "",
+					content_type=blob.content_type,
+				),
+			)
+
+			if len(files) >= max_keys:
+				break
+
+		return files
+
+	async def get_file_info(self, key: str) -> FileInfo:
+		"""
+		Get information about a specific Azure blob.
+
+		Args:
+			key: The key/path of the file
+
+		Returns:
+			FileInfo object with file details
+
+		"""
+		blob_client = self.client.get_blob_client(
+			container=self.container_name, blob=key
+		)
+
+		properties = await blob_client.get_blob_properties()
+
+		return FileInfo(
+			key=key,
+			size=properties.size or 0,
+			last_modified=properties.last_modified.isoformat() if properties.last_modified else "",
+			etag=properties.etag or "",
+			content_type=properties.content_type,
+		)
+
+	async def delete_file(self, key: str) -> bool:
+		"""
+		Delete a file from Azure Blob Storage.
+
+		Args:
+			key: The key/path of the file to delete
+
+		Returns:
+			True if deletion was successful
+
+		"""
+		try:
+			blob_client = self.client.get_blob_client(
+				container=self.container_name, blob=key
+			)
+			await blob_client.delete_blob()
+			return True
+		except Exception:
+			return False

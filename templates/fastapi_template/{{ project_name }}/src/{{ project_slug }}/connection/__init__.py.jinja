@@ -1,0 +1,4 @@
+{% if database %}
+from .database import database, inject_session, Base
+__all__ = ["Base", "database", "inject_session"]
+{% endif %}

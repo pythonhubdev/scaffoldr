@@ -1,0 +1,76 @@
+from collections.abc import AsyncGenerator, Callable
+from functools import wraps
+from typing import Any, cast
+
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+from {{ project_slug }}.core.config import settings
+
+Base = declarative_base()
+
+class Database:
+	"""Database connection manager for async SQLAlchemy operations."""
+
+	def __init__(self) -> None:
+		"""Initialize the database connection."""
+		self.engine = create_async_engine(
+			settings.database.URL,
+			echo=settings.database.ECHO,
+			future=True,
+		)
+		self.session_factory = async_sessionmaker(
+			bind=self.engine,
+			expire_on_commit=False,
+			autocommit=False,
+			autoflush=False,
+			class_=AsyncSession,
+		)
+
+	async def get_db(self) -> AsyncGenerator[AsyncSession]:
+		"""
+		Get a database session with automatic commit/rollback handling.
+
+		Yields:
+			AsyncSession: Database session
+
+		"""
+		async with self.session_factory() as session:
+			try:
+				yield session
+				await session.commit()
+			except Exception:
+				await session.rollback()
+				raise
+
+	async def close(self) -> None:
+		"""Close the database engine."""
+		await self.engine.dispose()
+
+
+# Global database instance
+database = Database()
+
+
+def inject_session(func: Callable[..., Any]) -> Callable[..., Any]:
+	"""
+	Decorator to inject database session into function kwargs.
+
+	Args:
+		func: Function to decorate
+
+	Returns:
+		Decorated function with session injection
+
+	"""
+
+	@wraps(func)
+	async def wrapper(*args: Any, **kwargs: Any) -> Any:
+		async for session in database.get_db():
+			if "session" in kwargs:
+				raise ValueError("Session argument already provided")
+			kwargs["session"] = session
+			return await func(*args, **kwargs)
+		return None  # This should never be reached, but for type safety
+
+	return cast("Callable[..., Any]", wrapper)

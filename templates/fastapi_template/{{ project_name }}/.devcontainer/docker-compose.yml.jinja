@@ -1,0 +1,18 @@
+services:
+  {{project_name}}:
+        build:
+            context: ..
+            dockerfile: .devcontainer/Dockerfile
+            target: production
+        environment:
+            - PYTHONUNBUFFERED=1
+        ports:
+            - "8443:8000"  # Changed: Use 8443 for HTTPS externally
+        command: [ "{{ project_slug }}", "--host", "0.0.0.0", "--port", "8000", "--workers", "4" ]
+        healthcheck:
+            test: [ "CMD", "curl", "-k", "-f", "https://localhost:8000/api" ]  # Updated: Use HTTPS with -k flag for self-signed cert
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+        restart: unless-stopped

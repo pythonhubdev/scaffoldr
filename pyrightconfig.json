@@ -8,7 +8,8 @@
 		"**/__pycache__",
 		"dist",
 		"build",
-		".git"
+		".git",
+		"templates"
 	],
 	"defineConstant": {
 		"DEBUG": true
@@ -20,5 +21,6 @@
 	"pythonPlatform": "All",
 	"useLibraryCodeForTypes": true,
 	"autoImportCompletions": true,
-	"reportUnusedCallResult": false
+	"reportUnusedCallResult": false,
+	"reportImplicitStringConcatenation": false
 }

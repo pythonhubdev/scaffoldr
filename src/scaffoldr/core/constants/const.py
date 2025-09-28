@@ -1,3 +1,20 @@
-import rich
+from enum import Enum
 
-console = rich.console.Console()
+from rich.console import Console
+
+console = Console()
+
+
+class Frameworks(str, Enum):
+	FASTAPI = "fastapi"
+	LITESTAR = "litestar"
+	FLASK = "flask"
+	QUARTZ = "quartz"
+	ROBYN = "robyn"
+
+
+class CloudTypes(str, Enum):
+	AWS = "aws"
+	GCP = "gcp"
+	AZURE = "azure"
+	NONE = "none"

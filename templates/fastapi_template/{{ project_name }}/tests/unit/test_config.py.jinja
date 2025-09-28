@@ -1,0 +1,50 @@
+"""Unit tests for core configuration."""
+
+import pytest
+
+from {{ project_slug }}.core.config import get_settings, Settings
+
+
+@pytest.mark.unit
+class TestSettings:
+	"""Test cases for application settings."""
+
+	def test_settings_creation(self) -> None:
+		"""Test that settings can be created."""
+		settings = get_settings()
+		assert isinstance(settings, Settings)
+		assert hasattr(settings, "app")
+		assert hasattr(settings, "server")
+		assert hasattr(settings, "log")
+		{% if database %}
+		assert hasattr(settings, "database")
+		{% endif %}
+
+	def test_app_settings(self) -> None:
+		"""Test application settings have expected attributes."""
+		settings = get_settings()
+		assert hasattr(settings.app, 'DEBUG')
+		assert hasattr(settings.app, 'VERSION')
+		assert hasattr(settings.app, 'TITLE')
+		assert isinstance(settings.app.VERSION, str)
+		assert isinstance(settings.app.TITLE, str)
+
+	def test_server_settings(self) -> None:
+		"""Test server settings have expected attributes."""
+		settings = get_settings()
+		assert hasattr(settings.server, 'HOST')
+		assert hasattr(settings.server, 'PORT')
+		assert isinstance(settings.server.HOST, str)
+		assert isinstance(settings.server.PORT, int)
+		assert settings.server.PORT > 0
+
+	{% if database %}
+	def test_database_settings(self) -> None:
+		"""Test database settings have expected attributes."""
+		settings = get_settings()
+		assert hasattr(settings.database, 'URL')
+		assert hasattr(settings.database, 'ECHO')
+		assert isinstance(settings.database.URL, str)
+		assert isinstance(settings.database.ECHO, bool)
+		assert "sqlite" in settings.database.URL  # Should contain sqlite for basic setup
+	{% endif %}

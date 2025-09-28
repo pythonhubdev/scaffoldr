@@ -291,3 +291,4 @@ opencode.json
 # END Ruler Generated Files
 
 .cache_ggshield
+!.env.jinja

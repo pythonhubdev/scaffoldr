@@ -52,6 +52,3 @@ jobs:
 
             -   name: Type check
                 run: uv run basedpyright .
-
-            -   name: Run MyPy
-                run: uv run mypy . --install-types --non-interactive

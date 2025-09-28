@@ -1,0 +1,33 @@
+"""Tests for health check endpoints."""
+
+import pytest
+from fastapi.testclient import TestClient
+{% if database %}
+from sqlalchemy.ext.asyncio import AsyncSession
+{% endif %}
+
+
+class TestHealth:
+	"""Test cases for health check endpoints."""
+
+	def test_health_endpoint(self, client: TestClient) -> None:
+		"""Test the health check endpoint."""
+		response = client.get("/")
+		assert response.status_code == 200
+		data = response.json()
+		assert "status" in data
+		assert data["status"] == "success"
+
+	{% if database %}
+	@pytest.mark.asyncio
+	async def test_health_endpoint_with_database(
+		self, client: TestClient, db_session: AsyncSession
+	) -> None:
+		"""Test health check with database connectivity."""
+		response = client.get("/")
+		assert response.status_code == 200
+		data = response.json()
+		assert "status" in data
+		assert data["status"] == "success"
+		# Note: Database health check not implemented in basic health endpoint
+	{% endif %}
