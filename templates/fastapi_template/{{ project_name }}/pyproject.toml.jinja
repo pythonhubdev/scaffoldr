@@ -35,13 +35,15 @@ dependencies = [
 	{% elif cloud_type == 'gcp' %}
 	"google-cloud-storage>=3.4.0",
 	{% endif %}
+	{% if database %}
 	"aiosqlite>=0.21.0",
+	"sqlalchemy[asyncio]>=2.0.0",
+	{% endif %}
 	"fastapi>=0.117.1",
 	"granian[reload]>=2.5.4",
 	"httpx>=0.28.1",
 	"pydantic>=2.0.0",
 	"pydantic-settings>=2.0.0",
-	"sqlalchemy[asyncio]>=2.0.0",
 	"python-multipart>=0.0.20",
 	"orjson>=3.11.3",
 	"rich>=14.1.0",

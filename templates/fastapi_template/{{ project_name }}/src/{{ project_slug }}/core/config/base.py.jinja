@@ -139,8 +139,10 @@ class Settings(BaseSettings):
 	app: AppSettings = Field(default_factory=AppSettings)
 	server: ServerSettings = Field(default_factory=ServerSettings)
 	log: LogSettings = Field(default_factory=LogSettings)
-	cloud: CloudSettings = Field(default_factory=cast("Callable[[], CloudSettings]", CloudSettings))
+	{% if database %}
 	database: DatabaseSettings = Field(default_factory=DatabaseSettings)
+	{% endif %}
+	cloud: CloudSettings = Field(default_factory=cast("Callable[[], CloudSettings]", CloudSettings))
 
 
 @lru_cache

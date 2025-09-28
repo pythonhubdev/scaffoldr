@@ -226,7 +226,7 @@ async def custom_exception_handler(request: Request, exc: CustomException):
 1. **Create Feature Directory**
    ```bash
    mkdir src/backend/features/new_feature
-   touch src/backend/features/new_feature/__init__.py.jinja
+   touch src/backend/features/new_feature/__init__.py
    ```
 
 2. **Create Core Files**
