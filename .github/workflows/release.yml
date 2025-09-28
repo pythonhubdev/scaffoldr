@@ -120,11 +120,28 @@ jobs:
             -   name: Install dependencies
                 run: uv sync --all-extras --group dev
 
-            -   name: Create release
+            -   name: Update version and commit/tag/push
                 env:
-                    GH_TOKEN: ${{ steps.app-token.outputs.token }}
-                run: |
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: uv run semantic-release -vv version  # Updates pyproject.toml, commits, tags, pushes
 
-                    # Run the full semantic-release process: version bump, changelog, tag, and GitHub release
-                    echo "Running semantic-release..."
-                    uv run semantic-release -v
+            -   name: Build artifacts with new version
+                run: uv build  # Builds dist/ with the updated version from pyproject.toml
+
+            -   name: Generate changelog
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: uv run semantic-release -vv --strict changelog  # Generates/updates CHANGELOG.md
+
+            -   name: Amend commit with changelog and lock file
+                run: |
+                    git add CHANGELOG.md uv.lock
+                    git commit --amend --no-edit
+                    git tag ${{ needs.build.outputs.new-release-tag }} --force
+                    git push --force-with-lease
+                    git push --tags --force
+
+            -   name: Publish release
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: uv run semantic-release -vv publish  # Uploads dist/ to GitHub Release
