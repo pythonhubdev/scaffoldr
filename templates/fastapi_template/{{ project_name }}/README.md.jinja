@@ -18,12 +18,12 @@
 
 1. Install dependencies:
    ```bash
-   pip install -e .
+   uv sync
    ```
 
 2. Run the development server:
    ```bash
-   {{project_slug}} dev
+   uv run {{project_slug}}
    ```
 
 3. Open your browser to `http://localhost:8000`
@@ -37,7 +37,7 @@ Once the server is running, visit `http://localhost:8000/docs` for the interacti
 ```
 src/
 ├── __main__.py                 # Application entry point
-└── backend/
+└── {{project_slug}}/
     ├── api/                    # API layer configuration
     ├── core/                   # Core application components
     ├── database/               # Data access layer
@@ -54,7 +54,7 @@ src/
 1. Clone the repository
 2. Install dependencies:
    ```bash
-   pip install -e ".[dev]"
+   uv sync --extra dev
    ```
 3. Run pre-commit hooks:
    ```bash
@@ -63,24 +63,17 @@ src/
 
 ### Commands
 
-- `{{project_slug}} dev` - Run development server
-- `{{project_slug}} run` - Run production server
+- `uv run {{project_slug}}` - Run development server
 
 ### Testing
 
 ```bash
-pytest
+uv run pytest
 ```
 
 ### Code Quality
 
 ```bash
-ruff check .
-black .
-isort .
-mypy .
+uv run ruff check .
+uv run mypy .
 ```
-
-## License
-
-MIT
