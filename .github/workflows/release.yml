@@ -54,47 +54,12 @@ jobs:
                 env:
                     GH_TOKEN: "none"  # Prevents accidental push
                 run: |
-                    # Run semantic-release in dry-run mode to check if a release should be made
-                    set +e  # Don't exit on error
-                    OUTPUT=$(uv run semantic-release --dry-run version 2>&1)
-                    EXIT_CODE=$?
-                    set -e  # Re-enable exit on error
+                    uv run semantic-release -v version --no-commit --no-tag
+                    echo "Check Outputs: ${{ steps.version.outputs }}"
+                    echo "Check Outputs: ${{ steps.version.outputs.released }}"
 
-                    echo "Semantic release dry-run output:"
-                    echo "$OUTPUT"
-                    echo "Exit code: $EXIT_CODE"
-
-                    # Debug information
-                    echo "Repository: ${{ github.repository }}"
-                    echo "Branch: ${{ github.ref_name }}"
-                    echo "Commit: ${{ github.sha }}"
-
-                    # Check if semantic-release would make a release (exit code 0 means release would be made)
-                    if [ $EXIT_CODE -eq 0 ]; then
-                        # Try to extract the version that would be released
-                        VERSION=$(echo "$OUTPUT" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1 || echo "")
-
-                        if [ -n "$VERSION" ]; then
-                            echo "New release would be created: $VERSION"
-                            echo "released=true" >> $GITHUB_OUTPUT
-                            echo "version=$VERSION" >> $GITHUB_OUTPUT
-                            echo "tag=v$VERSION" >> $GITHUB_OUTPUT
-                            echo "is_prerelease=false" >> $GITHUB_OUTPUT
-                        else
-                            # If we can't extract version but exit code is 0, still proceed
-                            echo "Release would be created but version unclear, proceeding anyway"
-                            echo "released=true" >> $GITHUB_OUTPUT
-                            echo "version=unknown" >> $GITHUB_OUTPUT
-                            echo "tag=unknown" >> $GITHUB_OUTPUT
-                            echo "is_prerelease=false" >> $GITHUB_OUTPUT
-                        fi
-                    else
-                        echo "No release would be made (exit code: $EXIT_CODE)"
-                        echo "released=false" >> $GITHUB_OUTPUT
-                        echo "version=" >> $GITHUB_OUTPUT
-                        echo "tag=" >> $GITHUB_OUTPUT
-                        echo "is_prerelease=false" >> $GITHUB_OUTPUT
-                    fi
+                # Assuming this step sets outputs like 'released', 'version', 'tag', 'is_prerelease' via $GITHUB_OUTPUT parsing.
+                # If not, add e.g.: echo "released=true" >> $GITHUB_OUTPUT (adjust based on your logic).
 
             -   name: Upload lock file artifact (if needed for release)
                 if: ${{ steps.version.outputs.released == 'true' }}
