@@ -1,6 +1,6 @@
 [project]
 name = "scaffoldr"
-version = "1.0.0"
+version = "1.1.0"
 description = "Generate production-ready Python web projects in seconds."
 authors = [
 	{ name = "Vetrichelvan", email = "pythonhubdev@gmail.com" }
