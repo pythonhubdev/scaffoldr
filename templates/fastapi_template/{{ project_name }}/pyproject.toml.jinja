@@ -34,6 +34,9 @@ dependencies = [
 	"aioboto3>=13.1.1",
 	{% elif cloud_type == 'gcp' %}
 	"google-cloud-storage>=3.4.0",
+	{% elif cloud_type == 'azure' %}
+	"azure-storage-blob>=12.26.0",
+	"azure-identity>=1.25.0",
 	{% endif %}
 	{% if database %}
 	"aiosqlite>=0.21.0",

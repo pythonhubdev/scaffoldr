@@ -110,6 +110,10 @@ class CloudSettings(BaseSettings):
 	REGION_NAME: str = "us-east-1"
 	{% elif cloud_type == 'gcp' %}
 	PROJECT_ID: str
+	{% elif cloud_type == 'azure' %}
+	ACCOUNT_NAME: str
+	ACCOUNT_KEY: str
+	CONTAINER_NAME: str
 	{% endif %}
 
 	model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
