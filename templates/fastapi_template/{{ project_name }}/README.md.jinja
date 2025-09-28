@@ -70,7 +70,30 @@ src/
 ### Testing
 
 ```bash
+# Run all tests
 uv run pytest
+
+# Run unit tests only
+uv run pytest -m unit
+
+# Run integration tests only
+uv run pytest -m integration
+
+# Run tests with coverage
+uv run pytest --cov=src --cov-report=html
+```
+
+### Test Structure
+
+```
+tests/
+├── conftest.py              # Test configuration and fixtures
+├── test_app.py              # Basic application tests
+├── test_health.py           # Health check tests
+├── unit/                    # Unit tests
+│   └── test_config.py       # Configuration tests
+└── integration/            # Integration tests
+    └── test_api.py          # API integration tests
 ```
 
 ### Code Quality

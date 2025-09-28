@@ -1,0 +1,42 @@
+"""Unit tests for core configuration."""
+
+import pytest
+
+from {{ project_slug }}.core.config import get_settings, Settings
+
+
+@pytest.mark.unit
+class TestSettings:
+	"""Test cases for application settings."""
+
+	def test_settings_creation(self) -> None:
+		"""Test that settings can be created."""
+		settings = get_settings()
+		assert isinstance(settings, Settings)
+		assert hasattr(settings, "app")
+		assert hasattr(settings, "server")
+		assert hasattr(settings, "log")
+		{% if database %}
+		assert hasattr(settings, "database")
+		{% endif %}
+
+	def test_app_settings(self) -> None:
+		"""Test application settings have expected defaults."""
+		settings = get_settings()
+		assert settings.app.DEBUG is True  # Default for development
+		assert settings.app.VERSION == "1.0.0"
+		assert settings.app.TITLE == "{{ project_name }} API"
+
+	def test_server_settings(self) -> None:
+		"""Test server settings have expected defaults."""
+		settings = get_settings()
+		assert settings.server.HOST == "0.0.0.0"
+		assert settings.server.PORT == 8000
+
+	{% if database %}
+	def test_database_settings(self) -> None:
+		"""Test database settings have expected defaults."""
+		settings = get_settings()
+		assert "sqlite" in settings.database.URL
+		assert settings.database.ECHO is False
+	{% endif %}
