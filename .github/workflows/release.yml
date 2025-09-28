@@ -124,13 +124,7 @@ jobs:
                 env:
                     GH_TOKEN: ${{ steps.app-token.outputs.token }}
                 run: |
-                    echo "Creating release with the following information:"
-                    echo "Expected version: ${{ needs.build.outputs.new-release-version }}"
-                    echo "Expected tag: ${{ needs.build.outputs.new-release-tag }}"
-                    echo "Is prerelease: ${{ needs.build.outputs.new-release-is-prerelease }}"
-                    echo "Repository: ${{ github.repository }}"
-                    echo ""
 
                     # Run the full semantic-release process: version bump, changelog, tag, and GitHub release
                     echo "Running semantic-release..."
-                    uv run semantic-release -vv
+                    uv run semantic-release -v
