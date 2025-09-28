@@ -50,7 +50,9 @@ class GenerateCommand:
 			raise typer.Exit(1)
 
 		# Get template path
-		template_path = Path(__file__).parent / "templates" / f"{framework}_template"
+		template_path = (
+			Path(__file__).parent.parent.parent.parent / "templates" / f"{framework}_template"
+		)
 
 		if not template_path.exists():
 			console.print(
