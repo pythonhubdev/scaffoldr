@@ -71,6 +71,7 @@ class GenerateCommand:
 			"use_docker": docker,
 			"cloud_type": cloud_type,
 			"database": use_database,
+			"framework": framework,
 		}
 
 		try:
