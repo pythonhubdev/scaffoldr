@@ -1,0 +1,122 @@
+import json
+import subprocess
+from enum import Enum
+from pathlib import Path
+
+import typer
+from dotenv import load_dotenv
+from {{ project_slug }}.core.utils import LoggingConfig
+
+from ._granian import GranianApplication
+from .application import app
+
+cli = typer.Typer(no_args_is_help=True)
+
+
+class AppMode(str, Enum):
+	"""
+	Enum for application modes.
+	"""
+
+	DEFAULT = "default"
+	CUSTOM = "custom"
+
+	@property
+	def description(self) -> str:
+		return {
+			AppMode.DEFAULT: "Run with all the standard, out-of-the-box behavior.",
+			AppMode.CUSTOM : "Enable custom plugins, feature-flags, and non-standard hooks.",
+		}[self]
+
+
+MODE_HELP = "Mode to run the application. Available modes:\n\n" + "\n".join(
+	f"  • {mode.value} — {mode.description}"
+	for mode in AppMode  # type: ignore
+)
+
+
+@cli.command(name="run", help="Run a {{project_name}} API server with Granian.")
+def granian(
+	mode: AppMode = typer.Option(
+		AppMode.DEFAULT,
+		"--mode",
+		"-m",
+		help=MODE_HELP,
+		show_default=True,
+	),
+	loc: str = typer.Option(
+		"src.{{ project_name }}.api.application:app",
+		"--app",
+		"-a",
+		help="Location of the FastAPI application to run.",
+		show_default=True,
+	),
+	host: str = typer.Option(
+		"0.0.0.0",
+		"--host",
+		"-h",
+		help="Host to bind the application to.",
+		show_default=True,
+	),
+	port: str = typer.Option(
+		"8000",
+		"--port",
+		"-p",
+		help="Port to bind the application to.",
+		show_default=True,
+	),
+	workers: int = typer.Option(
+		1,
+		"--workers",
+		"-w",
+		help="Number of HTTP workers to run the application with.",
+		show_default=True,
+	),
+	interface: str = typer.Option(
+		"asgi",
+		"--interface",
+		"-i",
+		help="Type of server to run the application with (e.g., 'asgi', 'wsgi', 'asginl').",
+		show_default=True,
+	),
+) -> None:
+	"""
+	Starts the Granian zone: all services and the API.
+	"""
+	LoggingConfig.configure_logging()
+	load_dotenv(".env")
+	if mode == AppMode.DEFAULT:
+		GranianApplication.run()
+	if mode == AppMode.CUSTOM:
+		subprocess.run(
+			[
+				"granian",
+				loc,
+				f"--host={host}",
+				f"--port={port}",
+				f"--workers={workers}",
+				f"--interface={interface}",
+			],
+			check=False,
+		)
+
+
+@cli.command(name="swagger", help="Save the OpenAPI schema to a file.")
+def save_swagger(
+	output: str = typer.Option(
+		"swagger/openapi.json",
+		"--output",
+		"-o",
+		help="Output file path to save the OpenAPI schema.",
+		show_default=True,
+	),
+) -> None:
+	"""
+	Saves the OpenAPI schema of the FastAPI application to a specified file.
+	"""
+	fastapi = app.openapi()
+	output_path = Path(output)
+	directory_list = "/".join(list(output_path.parent.parts))
+	Path(directory_list).mkdir(parents=True, exist_ok=True)
+	with output_path.open("w") as f:
+		json.dump(fastapi, f, indent=4)

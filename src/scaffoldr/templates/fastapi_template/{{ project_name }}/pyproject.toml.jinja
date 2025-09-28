@@ -1,0 +1,107 @@
+[project]
+name = "{{project_slug}}"
+version = "0.1.0"
+description = "{{description}}"
+authors = [
+	{ name = "{{author_name}}", email = "{{author_email}}" },
+]
+readme = "README.md"
+requires-python = ">={{python_version}}"
+maintainers = [
+	{ name = "{{author_name}}", email = "{{author_email}}" },
+]
+keywords = ["fastapi", "web", "api", "async"]
+classifiers = [
+	"Development Status :: 4 - Beta",
+	"Intended Audience :: Developers",
+	"License :: OSI Approved :: MIT License",
+	"Operating System :: OS Independent",
+	"Programming Language :: Python :: 3",
+	"Programming Language :: Python :: 3.9",
+	"Programming Language :: Python :: 3.10",
+	"Programming Language :: Python :: 3.11",
+	"Programming Language :: Python :: 3.12",
+	"Framework :: FastAPI",
+	"Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+	"Topic :: Software Development :: Libraries :: Python Modules",
+]
+homepage = "https://github.com/{{author_name}}/{{project_slug}}"
+repository = "https://github.com/{{author_name}}/{{project_slug}}"
+
+
+dependencies = [
+	"fastapi>=0.104.0",
+	"uvicorn[standard]>=0.24.0",
+	"pydantic>=2.0.0",
+	"pydantic-settings>=2.0.0",
+	"sqlalchemy>=2.0.0",
+	"alembic>=1.12.0",
+	"python-multipart>=0.0.6",
+	{% if use_s3 %}
+	"boto3>=1.28.0",
+	{% endif %}
+	"httpx>=0.25.0",
+	"granian[reload]>=1.0.0",
+]
+
+[dependency-groups]
+dev = [
+	"pytest>=7.0.0",
+	"pytest-asyncio>=0.21.0",
+	"pytest-cov>=4.0.0",
+	"black>=23.0.0",
+	"isort>=5.12.0",
+	"ruff>=0.1.0",
+	"pre-commit>=3.0.0",
+	"mypy>=1.0.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.7.19,<0.8.22"]
+build-backend = "uv_build"
+
+[project.scripts]
+"{{project_slug}}" = "{{ project_slug }}.api.cli:app"
+
+
+[tool.mypy]
+mypy_path = ["src"]
+namespace_packages = true
+explicit_package_bases = true
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+asyncio_mode = "auto"
+filterwarnings = [
+	"ignore::DeprecationWarning",
+]
+markers = [
+	"unit: marks tests as unit tests",
+	"slow: marks tests as slow",
+]
+addopts = "--rich"
+
+[tool.syrupy]
+exclude = ["tests/snapshots"]
+update_snapshots = "all"
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["tests/*", "**/__init__.py", "**/__main__.py"]
+branch = true
+
+
+[tool.coverage.report]
+exclude_lines = [
+	"pragma: no cover",
+	"def __repr__",
+	"raise NotImplementedError",
+	"if __name__ == .__main__.:",
+	"pass",
+	"raise ImportError",
+]
+show_missing = true

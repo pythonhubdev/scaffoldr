@@ -1,0 +1,154 @@
+import binascii
+import logging
+import os
+from functools import lru_cache
+from typing import TYPE_CHECKING, Annotated, ClassVar, Self, cast
+
+from granian.log import LogLevels
+from pydantic import AfterValidator, Field, model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+if TYPE_CHECKING:
+	from collections.abc import Callable
+
+TRUE_VALUES = {"true", "1", "yes", "y", "t"}
+
+GRANIAN_LOG_MAPPING = {
+	"INFO"    : LogLevels.info,
+	"DEBUG"   : LogLevels.debug,
+	"WARNING" : LogLevels.warning,
+	"ERROR"   : LogLevels.error,
+	"CRITICAL": LogLevels.critical,
+}
+
+
+def allowed_origins_validator(v: list[str] | None) -> list[str]:
+	if not v:
+		return ["*"]
+	if isinstance(v, str):
+		return [origin.strip() for origin in v.split(",")]
+	return v
+
+
+def true_bool_validator(v: str | bool) -> bool:
+	if isinstance(v, bool):
+		return v
+	return v.lower() in TRUE_VALUES
+
+
+def secret_key_validator(v: str | None) -> str:
+	if v:
+		return v
+	return binascii.hexlify(os.urandom(32)).decode()
+
+
+class LogSettings(BaseSettings):
+	LEVEL: int = logging.INFO
+	GRANIAN_ACCESS_LEVEL: int = 30
+	GRANIAN_ERROR_LEVEL: int = 20
+	GRANIAN_LOG_LEVEL: LogLevels = LogLevels.info
+
+	@model_validator(mode="after")
+	def granian_log_level(self) -> Self:
+		if not self.GRANIAN_LOG_LEVEL:
+			level_name = logging.getLevelName(self.LEVEL)
+			self.GRANIAN_LOG_LEVEL = GRANIAN_LOG_MAPPING.get(level_name, LogLevels.info)
+		return self
+
+	model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
+		env_prefix="{{project_slug}}_LOG_",
+	)
+
+
+class AppSettings(BaseSettings):
+	"""
+	Application settings.
+	"""
+
+	DEBUG: Annotated[
+		bool,
+		AfterValidator(true_bool_validator),
+	] = False
+	VERSION: str = "1.0.0"
+	TITLE: str = "{{ project_name }} API"
+	SUMMARY: str = "{{ project_name }} AI Assistant, a help, a partner, a friend by your side"
+	DESCRIPTION: str = "{{ project_name }} API servers all the backend needs of the {{ project_name }} platform."
+	ALLOWED_CORS_ORIGINS: Annotated[
+		list[str] | str | None,
+		AfterValidator(allowed_origins_validator),
+	] = None
+	SECRET_KEY: Annotated[str | None, AfterValidator(secret_key_validator)] = None
+	JWT_ENCRYPTION_ALGORITHM: str = "HS256"
+
+	model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
+		extra="ignore",
+		env_file=".env",
+		env_prefix="{{ project_slug }}_APP_",
+		env_file_encoding="utf-8",
+	)
+
+
+class ServerSettings(BaseSettings):
+	HOST: str = "0.0.0.0"
+	PORT: int = 8000
+	APP_LOCATION: str = "src.{{ project_slug }}.api.application:app"
+	HTTP_WORKERS: int = 1
+
+	model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
+		extra="ignore",
+		env_file=".env",
+		env_prefix="{{ project_slug }}_SERVER_",
+		env_file_encoding="utf-8",
+	)
+
+
+class CloudSettings(BaseSettings):
+	ACCESS_KEY: str
+	SECRET_KEY: str
+	BUCKET_NAME: str
+	REGION_NAME: str = "us-east-1"
+
+	model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
+		extra="ignore",
+		env_file=".env",
+		env_prefix="{{ project_slug }}_CLOUD_",
+		env_file_encoding="utf-8",
+	)
+
+
+class DatabaseSettings(BaseSettings):
+	URL: str = "sqlite+aiosqlite:///./{{ project_name|upper }}.db"
+	ECHO: Annotated[
+		bool,
+		AfterValidator(true_bool_validator),
+	] = False
+
+	model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
+		extra="ignore",
+		env_file=".env",
+		env_prefix="{{ project_slug }}_DB_",
+		env_file_encoding="utf-8",
+	)
+
+
+class Settings(BaseSettings):
+	app: AppSettings = Field(default_factory=AppSettings)
+	server: ServerSettings = Field(default_factory=ServerSettings)
+	log: LogSettings = Field(default_factory=LogSettings)
+	cloud: CloudSettings = Field(default_factory=cast("Callable[[], CloudSettings]", CloudSettings))
+	database: DatabaseSettings = Field(default_factory=DatabaseSettings)
+
+
+@lru_cache
+def get_settings() -> Settings:
+	"""
+	Get the application settings, cached for performance.
+
+	Returns:
+			Settings: The application settings instance.
+
+	"""
+	return Settings()
+
+
+settings = get_settings()

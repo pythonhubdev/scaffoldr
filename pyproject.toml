@@ -22,6 +22,7 @@ dependencies = [
 	"typer>=0.19.2",
 	"uv-build>=0.8.22",
 	"rich>=13.7.0",
+	"copier>=9.10.2",
 ]
 
 [dependency-groups]
@@ -55,6 +56,10 @@ build-backend = "uv_build"
 
 [tool.mypy]
 mypy_path = ["src"]
+exclude = [
+	"src/scaffoldr/templates/.*",
+	"src/scaffoldr/templates",
+]
 namespace_packages = true
 explicit_package_bases = true
 

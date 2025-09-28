@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# Branch name validation
+local_branch="$(git rev-parse --abbrev-ref HEAD)"
+valid_branch_regex="^(feat|fix|library|prerelease|release|hotfix|docs|style|refactor)\/[a-z0-9._-]+$"
+message="There is something wrong with your branch name. Branch names must adhere to: $valid_branch_regex"
+
+# Skip validation in detached HEAD state (e.g., during rebase)
+if [[ "$local_branch" != "HEAD" ]]; then
+    if [[ ! $local_branch =~ $valid_branch_regex ]]; then
+        echo "$message" >&2
+        exit 1
+    fi
+fi

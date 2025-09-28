@@ -1,0 +1,86 @@
+# {{project_name}}
+
+{{description}}
+
+## Features
+
+- **FastAPI**: Modern, fast web framework for building APIs
+- **Pydantic**: Data validation and serialization
+- **SQLAlchemy**: SQL toolkit and ORM
+- **Alembic**: Database migration tool
+- **Uvicorn**: ASGI web server
+- **Granian**: High-performance web server
+  {% if use_s3 %}
+- **AWS S3**: File storage integration
+  {% endif %}
+
+## Quick Start
+
+1. Install dependencies:
+   ```bash
+   pip install -e .
+   ```
+
+2. Run the development server:
+   ```bash
+   {{project_slug}} dev
+   ```
+
+3. Open your browser to `http://localhost:8000`
+
+## API Documentation
+
+Once the server is running, visit `http://localhost:8000/docs` for the interactive API documentation.
+
+## Project Structure
+
+```
+src/
+├── __main__.py                 # Application entry point
+└── backend/
+    ├── api/                    # API layer configuration
+    ├── core/                   # Core application components
+    ├── database/               # Data access layer
+    ├── errors/                 # Custom exception classes
+    ├── features/               # Feature modules (business logic)
+    ├── schema/                 # Global schemas
+    └── services/               # External service integrations
+```
+
+## Development
+
+### Setup
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   pip install -e ".[dev]"
+   ```
+3. Run pre-commit hooks:
+   ```bash
+   pre-commit install
+   ```
+
+### Commands
+
+- `{{project_slug}} dev` - Run development server
+- `{{project_slug}} run` - Run production server
+
+### Testing
+
+```bash
+pytest
+```
+
+### Code Quality
+
+```bash
+ruff check .
+black .
+isort .
+mypy .
+```
+
+## License
+
+MIT
