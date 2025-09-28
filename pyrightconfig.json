@@ -21,5 +21,6 @@
 	"pythonPlatform": "All",
 	"useLibraryCodeForTypes": true,
 	"autoImportCompletions": true,
-	"reportUnusedCallResult": false
+	"reportUnusedCallResult": false,
+	"reportImplicitStringConcatenation": false
 }
