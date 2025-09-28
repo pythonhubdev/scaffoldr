@@ -19,18 +19,11 @@ jobs:
             dist_artifacts_dir: dist
             lock_file_artifact: uv.lock
         steps:
-            -   uses: actions/create-github-app-token@v2
-                id: app-token
-                with:
-                    app-id: ${{ secrets.APP_ID }}
-                    private-key: ${{ secrets.APP_PRIVATE_KEY }}
-                    owner: ${{ github.repository_owner }}
-                    repositories: scaffoldr
             -   name: Check out repository
                 uses: actions/checkout@v5
                 with:
                     ref: ${{ github.ref }}
-                    token: ${{ steps.app-token.outputs.token }}
+                    token: ${{ secrets.GH_TOKEN }}
                     fetch-depth: 0
 
             -   name: Configure Git user
@@ -49,99 +42,25 @@ jobs:
             -   name: Install dependencies
                 run: uv sync --all-extras --group dev
 
-            -   name: Detect next version
-                id: version
-                env:
-                    GH_TOKEN: "none"  # Prevents accidental push
-                run: |
-                    uv run semantic-release -v version --no-commit --no-tag
-                    echo "Check Outputs: ${{ steps.version.outputs }}"
-                    echo "Check Outputs: ${{ steps.version.outputs.released }}"
+            -   name: Action | Semantic Version Release
+                id: release
+                uses: python-semantic-release/python-semantic-release@v10.4.1
+                with:
+                    github_token: ${{ secrets.GH_TOKEN }}
+                    git_committer_name: "github-actions"
+                    git_committer_email: "actions@users.noreply.github.com"
+                    changelog: true
 
-                # Assuming this step sets outputs like 'released', 'version', 'tag', 'is_prerelease' via $GITHUB_OUTPUT parsing.
-                # If not, add e.g.: echo "released=true" >> $GITHUB_OUTPUT (adjust based on your logic).
+            -   name: Publish | Upload to GitHub Release Assets
+                uses: python-semantic-release/publish-action@v10.4.1
+                if: steps.release.outputs.released == 'true'
+                with:
+                    github_token: ${{ secrets.GH_TOKEN }}
+                    tag: ${{ steps.release.outputs.tag }}
 
-            -   name: Upload lock file artifact (if needed for release)
-                if: ${{ steps.version.outputs.released == 'true' }}
+            -   name: Upload | Distribution Artifacts
                 uses: actions/upload-artifact@v4
                 with:
-                    name: ${{ env.lock_file_artifact }}
-                    path: ${{ env.lock_file_artifact }}
+                    name: distribution-artifacts
+                    path: dist
                     if-no-files-found: error
-                    retention-days: 2
-
-        outputs:
-            new-release-detected: ${{ steps.version.outputs.released }}
-            new-release-version: ${{ steps.version.outputs.version }}
-            new-release-tag: ${{ steps.version.outputs.tag }}
-            new-release-is-prerelease: ${{ steps.version.outputs.is_prerelease }}
-            lock-file-artifact: ${{ env.lock_file_artifact }}
-
-    release:
-        runs-on: ubuntu-latest
-        needs:
-            - build
-        if: ${{ needs.build.outputs.new-release-detected == 'true' }}
-        concurrency:
-            group: ${{ github.workflow }}-release-${{ github.ref_name }}
-            cancel-in-progress: false
-        permissions:
-            contents: write
-
-        steps:
-            -   uses: actions/create-github-app-token@v2
-                id: app-token
-                with:
-                    app-id: ${{ secrets.APP_ID }}
-                    private-key: ${{ secrets.APP_PRIVATE_KEY }}
-                    owner: ${{ github.repository_owner }}
-                    repositories: scaffoldr
-
-            -   name: Check out repository
-                uses: actions/checkout@v5
-                with:
-                    ref: ${{ github.ref }}
-                    token: ${{ steps.app-token.outputs.token }}
-                    fetch-depth: 0
-
-            -   name: Configure Git user
-                run: |
-                    git config user.name "github-actions[bot]"
-                    git config user.email "github-actions[bot]@users.noreply.github.com"
-
-            -   name: Install uv
-                uses: astral-sh/setup-uv@v5
-                with:
-                    pyproject-file: "pyproject.toml"
-                    python-version: "3.13"
-                    enable-cache: true
-                    cache-dependency-glob: "**/pyproject.toml"
-
-            -   name: Install dependencies
-                run: uv sync --all-extras --group dev
-
-            -   name: Update version and commit/tag/push
-                env:
-                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                run: uv run semantic-release -vv version  # Updates pyproject.toml, commits, tags, pushes
-
-            -   name: Build artifacts with new version
-                run: uv build  # Builds dist/ with the updated version from pyproject.toml
-
-            -   name: Generate changelog
-                env:
-                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                run: uv run semantic-release -vv --strict changelog  # Generates/updates CHANGELOG.md
-
-            -   name: Amend commit with changelog and lock file
-                run: |
-                    git add CHANGELOG.md uv.lock
-                    git commit --amend --no-edit
-                    git tag ${{ needs.build.outputs.new-release-tag }} --force
-                    git push --force-with-lease
-                    git push --tags --force
-
-            -   name: Publish release
-                env:
-                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                run: uv run semantic-release -vv publish  # Uploads dist/ to GitHub Release
