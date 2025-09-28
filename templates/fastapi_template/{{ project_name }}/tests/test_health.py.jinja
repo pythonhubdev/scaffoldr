@@ -3,7 +3,9 @@
 import pytest
 from fastapi.testclient import TestClient
 {% if database %}
+{% if database_type == 'sqlalchemy' %}
 from sqlalchemy.ext.asyncio import AsyncSession
+{% endif %}
 {% endif %}
 
 
@@ -19,6 +21,7 @@ class TestHealth:
 		assert data["status"] == "success"
 
 	{% if database %}
+	{% if database_type == 'sqlalchemy' %}
 	@pytest.mark.asyncio
 	async def test_health_endpoint_with_database(
 		self, client: TestClient, db_session: AsyncSession
@@ -30,4 +33,17 @@ class TestHealth:
 		assert "status" in data
 		assert data["status"] == "success"
 		# Note: Database health check not implemented in basic health endpoint
+	{% elif database_type == 'mongodb' %}
+	@pytest.mark.asyncio
+	async def test_health_endpoint_with_mongodb(
+		self, client: TestClient, mongodb_client: None,
+	) -> None:
+		"""Test health check with MongoDB connectivity."""
+		response = client.get("/")
+		assert response.status_code == 200
+		data = response.json()
+		assert "status" in data
+		assert data["status"] == "success"
+		# Note: Database health check not implemented in basic health endpoint
+	{% endif %}
 	{% endif %}

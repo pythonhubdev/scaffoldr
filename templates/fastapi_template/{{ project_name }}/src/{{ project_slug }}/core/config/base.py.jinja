@@ -125,11 +125,16 @@ class CloudSettings(BaseSettings):
 
 
 class DatabaseSettings(BaseSettings):
+	{% if database_type == 'sqlalchemy' %}
 	URL: str = "sqlite+aiosqlite:///./{{ project_name|upper }}.db"
 	ECHO: Annotated[
 		bool,
 		AfterValidator(true_bool_validator),
 	] = False
+	{% elif database_type == 'mongodb' %}
+	URL: str = "mongodb://localhost:27017"
+	DATABASE_NAME: str = "{{ project_name|lower }}_db"
+	{% endif %}
 
 	model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
 		extra="ignore",

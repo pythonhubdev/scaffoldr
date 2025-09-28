@@ -1,4 +1,7 @@
-{% if database %}
+{% if database_type == 'sqlalchemy' %}
 from .database import database, inject_session, Base
 __all__ = ["Base", "database", "inject_session"]
+{% elif database_type == 'mongodb' %}
+from .database import mongodb
+__all__ = ["mongodb"]
 {% endif %}
