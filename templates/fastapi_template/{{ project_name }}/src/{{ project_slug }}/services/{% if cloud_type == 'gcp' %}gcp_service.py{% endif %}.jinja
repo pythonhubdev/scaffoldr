@@ -1,0 +1,201 @@
+from collections.abc import AsyncGenerator
+from typing import TYPE_CHECKING, Any, BinaryIO
+
+from google.cloud import storage
+
+from {{ project_slug }}.core.config import settings
+from {{ project_slug }}.services.repositories.storage_repository import (
+	FileInfo,
+	StorageRepository,
+	UploadResult,
+)
+
+if TYPE_CHECKING:
+	from google.auth.credentials import Credentials
+
+
+class GCPStorageService(StorageRepository):
+	"""Google Cloud Storage implementation of StorageRepository."""
+
+	def __init__(
+		self,
+	) -> None:
+		"""
+		Initialize GCP storage repository.
+		"""
+		self.bucket_name: str = settings.cloud.BUCKET_NAME
+		self.project_id: str = settings.cloud.PROJECT_ID
+		self.credentials: Credentials | None = None
+
+		# Initialize the client
+		self.client = storage.Client(project=self.project_id, credentials=self.credentials)
+		self.bucket = self.client.bucket(self.bucket_name)
+
+	async def upload(
+		self,
+		file: BinaryIO | bytes,
+		key: str,
+		content_type: str | None = None,
+		metadata: dict[str, str] | None = None,
+	) -> UploadResult:
+		"""
+		Upload a file to Google Cloud Storage.
+
+		Args:
+			file: The file-like object to upload
+			key: The key/path where to store the file
+			content_type: The MIME type of the file
+			metadata: Optional metadata to store with the file
+
+		Returns:
+			UploadResult with file information
+
+		"""
+		blob = self.bucket.blob(key)
+
+		if content_type:
+			blob.content_type = content_type
+
+		if metadata:
+			blob.metadata = metadata
+
+		# Upload the file
+		if isinstance(file, bytes):
+			blob.upload_from_string(file)
+		else:
+			blob.upload_from_file(file)
+
+		return UploadResult(
+			key=key,
+			etag=blob.etag,
+			version_id=None,  # GCP doesn't use version IDs like S3
+		)
+
+	async def download(self, key: str) -> AsyncGenerator[bytes]:  # type: ignore[override]
+		"""
+		Download a file from Google Cloud Storage.
+
+		Args:
+			key: The key/path of the file to download
+
+		Yields:
+			Chunks of file data
+
+		"""
+		blob = self.bucket.blob(key)
+
+		# Download in chunks
+		chunk_size = 1024 * 1024  # 1MB chunks
+		download_stream = blob.download_as_bytes()
+
+		# Since google-cloud-storage doesn't have async methods,
+		# we'll yield the entire content at once for now
+		# In a production environment, you'd want to implement proper chunking
+		yield download_stream
+
+	async def get_presigned_url(
+		self,
+		key: str,
+		expiration: int = 3600,
+		operation: str = "get_object",
+	) -> str:
+		"""
+		Generate a signed URL for GCP file access.
+
+		Args:
+			key: The key/path of the file
+			expiration: URL expiration time in seconds (default 1 hour)
+			operation: The operation type ('get_object' or 'put_object')
+
+		Returns:
+			Signed URL string
+
+		"""
+		blob = self.bucket.blob(key)
+
+		if operation == "put_object":
+			url = blob.generate_signed_url(
+				version="v4",
+				expiration=expiration,
+				method="PUT",
+			)
+		else:
+			url = blob.generate_signed_url(
+				version="v4",
+				expiration=expiration,
+				method="GET",
+			)
+
+		return url
+
+	async def list_files(
+		self,
+		prefix: str | None = None,
+		max_keys: int = 1000,
+	) -> list[FileInfo]:
+		"""
+		List files in GCP bucket with optional prefix.
+
+		Args:
+			prefix: The prefix/path to list files from
+			max_keys: Maximum number of files to return
+
+		Returns:
+			List of FileInfo objects
+
+		"""
+		blobs = self.bucket.list_blobs(prefix=prefix, max_results=max_keys)
+
+		files = []
+		for blob in blobs:
+			files.append(
+				FileInfo(
+					key=blob.name,
+					size=blob.size or 0,
+					last_modified=blob.updated.isoformat() if blob.updated else "",
+					etag=blob.etag or "",
+					content_type=blob.content_type,
+				),
+			)
+
+		return files
+
+	async def get_file_info(self, key: str) -> FileInfo:
+		"""
+		Get information about a specific GCP file.
+
+		Args:
+			key: The key/path of the file
+
+		Returns:
+			FileInfo object with file details
+
+		"""
+		blob = self.bucket.blob(key)
+		blob.reload()  # Fetch metadata
+
+		return FileInfo(
+			key=key,
+			size=blob.size or 0,
+			last_modified=blob.updated.isoformat() if blob.updated else "",
+			etag=blob.etag or "",
+			content_type=blob.content_type,
+		)
+
+	async def delete_file(self, key: str) -> bool:
+		"""
+		Delete a file from Google Cloud Storage.
+
+		Args:
+			key: The key/path of the file to delete
+
+		Returns:
+			True if deletion was successful
+
+		"""
+		try:
+			blob = self.bucket.blob(key)
+			blob.delete()
+			return True
+		except Exception:
+			return False

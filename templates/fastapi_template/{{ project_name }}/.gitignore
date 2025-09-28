@@ -248,7 +248,6 @@ fabric.properties
 
 .idea/
 .vscode/
-.env.example.jinja
 
 # START Ruler Generated Files
 /.gemini/settings.json
@@ -260,3 +259,5 @@ fabric.properties
 /AGENTS.md
 /AGENTS.md.bak
 # END Ruler Generated Files
+
+!.env.example.jinja

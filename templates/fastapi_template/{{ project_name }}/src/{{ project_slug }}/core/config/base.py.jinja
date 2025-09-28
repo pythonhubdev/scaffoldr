@@ -103,10 +103,14 @@ class ServerSettings(BaseSettings):
 
 
 class CloudSettings(BaseSettings):
+	{% if cloud_type == 'aws' %}
 	ACCESS_KEY: str
 	SECRET_KEY: str
 	BUCKET_NAME: str
 	REGION_NAME: str = "us-east-1"
+	{% elif cloud_type == 'gcp' %}
+	PROJECT_ID: str
+	{% endif %}
 
 	model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
 		extra="ignore",
